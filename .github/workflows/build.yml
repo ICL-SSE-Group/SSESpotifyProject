@@ -1,27 +1,32 @@
-name: Build and Deploy
-
-on:
-  push:
-    branches:
-      - main  # Triggers workflow only on push to the main branch
-
+name: Build
+on: [push]
 jobs:
   python-formatting:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
-
+          python-version: 3.12
       - name: Install flake8
         run: pip install flake8
-
       - name: Run flake8
         run: flake8 .
+
+  build:
+    needs: python-formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Flask
+        run: pip install Flask
+      - name: Install Pytest
+        run: pip install pytest
+      - name: Runs tests
+        run: pytest *.py
 
   deploy-to-impaas:
     needs: python-formatting
@@ -31,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ImPaaS-Deploy
-        uses: /impaas/impaas-
+        uses: /impaas/impaas-deploy@v3
         with:
           app-name: spotifyapp
           deployment-token: ${{ secrets.TEAM_TOKEN }}
