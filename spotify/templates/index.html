@@ -1,4 +1,124 @@
-<h1> Spotify App </h1>
-<p>
-    Index page for spotify app.
-</p>
+<html>
+    <head>
+        <style type="text/css">
+        /* Spotify Theme Updates */
+        .navbar {
+                background: black; /* Spotify black */
+                padding-right: 15px;
+                padding-left: 15px;
+                border-radius: 10px;
+        }
+        .navdiv {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+        }
+        .center {
+                align-items: center;
+                justify-content: space-between;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+        }
+        .logo a {
+                font-size: 25px;
+                font-weight: 400;
+                color: #1DB954; /* Spotify green */
+                text-decoration: none;
+        }
+        li {
+                list-style: none;
+                display: inline-block;
+        }
+        li a {
+                color: white; /* White text for links */
+                font-size: 18px;
+                font-weight: bold;
+                margin-right: 25px;
+                text-decoration: none;
+        }
+        li a:hover {
+                color: #1DB954; /* Spotify green on hover */
+        }
+        p {
+                text-align: center;
+                color: white; /* White text for paragraphs */
+        }
+        form {
+                text-align: center;
+                margin-top: 20px;
+        }
+        body {
+                background-color: black; /* Spotify black for body */
+                color: white; /* White text for overall readability */
+                font-family: calibri, sans-serif;
+        }
+        input[type="text"] {
+                padding: 8px;
+                border: 1px solid #1DB954;
+                border-radius: 4px;
+                color: black;
+                width: 80%;
+        }
+        input[type="submit"] {
+                background-color: #1DB954; /* Spotify green for button */
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 10px 20px;
+                cursor: pointer;
+        }
+        input[type="submit"]:hover {
+                background-color: #14863e; /* Slightly darker green on hover */
+        }
+        .album-covers {
+            text-align: center; /* Center-align the header */
+            margin-top: 40px;
+        }
+        .album-covers img {
+            width: 150px; /* Fixed size for album covers */
+            height: 150px;
+            margin: 10px; /* Spacing between album covers */
+            border-radius: 10px; /* Rounded corners for album covers */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Adds a slight shadow for better appearance */
+        }
+        .album-covers h3 {
+            font-size: 20px;
+            color: #1DB954; /* Spotify green */
+            margin-bottom: 20px;
+        }
+        .album-container {
+            display: flex;
+            justify-content: center; /* Centers the album covers horizontally */
+            flex-wrap: wrap; /* Allows the covers to wrap onto new lines if needed */
+            gap: 20px; /* Adds spacing between items */
+        }
+        </style>
+</head>
+        <body style ="background-color: #121212;">
+                <nav class="navbar">
+                        <div class="navdiv">
+                                <ul>
+                                        <li><a href="https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fopen.spotify.com%2F">Spotify Sign In</a></li>
+                                </ul>
+                        </div>
+                </nav>
+                        <p> Enter a spotify artist to see recommended tracks.</p>
+
+                        <form action="{{url_for('query')}}"  method="post">
+                                <label for="spotify-artist">Enter an artist from Spotify:</label><br>
+                                <input type="text" id="spotify-artist" name="spotify_artist" required>
+                                <input type="submit" value="Submit">
+                        </form>
+                    <div class="album-covers">
+                        <h3>Notable Albums</h3>
+                        <div class="album-container">
+                            <img src="https://via.placeholder.com/150" alt="Album Cover 1">
+                            <img src="https://via.placeholder.com/150" alt="Album Cover 2">
+                            <img src="https://via.placeholder.com/150" alt="Album Cover 3">
+                            <img src="https://via.placeholder.com/150" alt="Album Cover 4">
+                            <img src="https://via.placeholder.com/150" alt="Album Cover 5">
+                        </div>
+                    </div>
+        </body>
+</html>
