@@ -122,3 +122,88 @@
                     </div>
         </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Artist Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        input, button {
+            font-size: 16px;
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Spotify Artist Search</h1>
+        <form id="artistForm">
+            <label for="artistName">Enter Artist Name:</label>
+            <input type="text" id="artistName" name="artist_name" required>
+            <button type="submit">Search Top Tracks</button>
+        </form>
+        <h2 id="artistNameHeader"></h2>
+        <ul id="topTracks"></ul>
+    </div>
+
+    <script>
+        const form = document.getElementById('artistForm');
+        const artistNameHeader = document.getElementById('artistNameHeader');
+        const topTracksList = document.getElementById('topTracks');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const artistName = document.getElementById('artistName').value;
+
+            artistNameHeader.textContent = "Loading...";
+            topTracksList.innerHTML = "";
+
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({ artist_name: artistName })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    artistNameHeader.textContent = errorData.error || "Something went wrong!";
+                    return;
+                }
+
+                const data = await response.json();
+                artistNameHeader.textContent = `Top Tracks for ${data.artist_name}`;
+                data.top_tracks.forEach((track) => {
+                    const li = document.createElement('li');
+                    li.textContent = track;
+                    topTracksList.appendChild(li);
+                });
+            } catch (error) {
+                artistNameHeader.textContent = "Failed to fetch top tracks.";
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
