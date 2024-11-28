@@ -17,10 +17,6 @@ client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 SPOTIFY_TOKEN = get_token(client_id, client_secret)
 
-
-
-token = get_token()
-
 @app.route("/")
 def index():
     """Render the homepage."""
