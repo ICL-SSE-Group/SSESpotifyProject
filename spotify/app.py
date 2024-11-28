@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify, render_template, redirect, url_for
 import os
-import requests
 from APIQueries import artist_search, get_top_tracks
 
 app = Flask(__name__)
