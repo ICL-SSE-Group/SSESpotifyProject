@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Repositories</title>
+        <style>
+            /* Spotify Theme Updates */
+            body {
+                background-color: black; /* Spotify black for body */
+                color: white; /* White text for overall readability */
+                font-family: Calibri, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            h1 {
+                color: #1DB954; /* Spotify green */
+                text-align: center;
+                margin-top: 20px;
+                font-size: 22px;
+            }
+            table {
+                width: 90%;
+                margin: 20px auto;
+                border-collapse: collapse;
+                background-color: #121212; /* Spotify dark gray */
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            th, td {
+                padding: 10px;
+                text-align: left;
+                border-bottom: 1px solid #1DB954; /* Spotify green for borders */
+            }
+            th {
+                background-color: #1DB954; /* Spotify green for headers */
+                color: black;
+            }
+            tr:nth-child(even) {
+                background-color: #222222; /* Slightly lighter black for rows */
+            }
+            tr:hover {
+                background-color: #333333; /* Highlight row on hover */
+            }
+            a {
+                color: #1DB954; /* Spotify green for links */
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            .navbar {
+                background: black; /* Spotify black */
+                padding: 10px 20px;
+                display: flex;
+                text-align: center;
+            }
+            .navbar a {
+                color: #1DB954; /* Spotify green for nav links */
+                text-decoration: none;
+                font-size: 18px;
+                font-weight: bold;
+            }
+            .navbar a:hover {
+                color: white; /* White text on hover */
+            }
+            
+            .navbar .left {
+            margin-right: auto; /* Align to the left */
+            }
+        </style>
+    </head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="left">Home</a>
+    </nav>
+    <h1>Artist Details</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Artist Name</th>
+                <th>ID</th>
+                <th>Genres</th>
+                <th>Followers</th>
+                <th>Popularity</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td>{{ artist.name }}</td>
+                    <td>{{ identification }}</td>
+                    <td>{{ genres }}</td>
+                    <td>{{ followers }}</td>
+                    <td>{{ popularity }}</td>
+                    <td>{{ image }}</td>
+                </tr>
+        </tbody>
+    </table>
+    <div style="text-align: center; margin-top: 40px;">
+        <h2>Song Recommendations for {{ artist_name }}:</h2>
+        <ul style="list-style-type: none; padding: 0;">
+                <li style="margin: 10px 0; font-size: 18px;">🎵 {{ track }}</li>
+        </ul>
+    </div>
+</body>
+</html>

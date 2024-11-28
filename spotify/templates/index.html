@@ -103,22 +103,11 @@
                                 </ul>
                         </div>
                 </nav>
-                        <p> Enter a spotify artist to see recommended tracks.</p>
-
                         <form action="{{url_for('query')}}"  method="post">
-                                <label for="spotify-artist">Enter an artist from Spotify:</label><br>
+                                <label for="spotify-artist">Enter the name of an artist in Spotify to see their recommended tracks:</label><br>
                                 <input type="text" id="spotify-artist" name="spotify_artist" required>
                                 <input type="submit" value="Submit">
                         </form>
-
-                                <div style="text-align: center; margin-top: 40px;">
-                                        <h2>Top Tracks for {{ artist_name }}</h2>
-                                        <ul style="list-style-type: none; padding: 0;">
-                                                {% for track in top_tracks %}
-                                                <li style="margin: 10px 0; font-size: 18px;">🎵 {{ track }}</li>
-                                                {% endfor %}
-                                        </ul>
-                                </div>
 
                     <div class="album-covers">
                         <h3>Notable Albums</h3>
