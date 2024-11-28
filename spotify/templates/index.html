@@ -105,17 +105,12 @@
                 </nav>
                         <p> Enter a spotify artist to see recommended tracks.</p>
 
-                        {% if error %}
-                                <p style="color: red; text-align: center;">{{ error }}</p>
-                        {% endif %}
-
                         <form action="{{url_for('query')}}"  method="post">
                                 <label for="spotify-artist">Enter an artist from Spotify:</label><br>
                                 <input type="text" id="spotify-artist" name="spotify_artist" required>
                                 <input type="submit" value="Submit">
                         </form>
 
-                        {% if artist_name %}
                                 <div style="text-align: center; margin-top: 40px;">
                                         <h2>Top Tracks for {{ artist_name }}</h2>
                                         <ul style="list-style-type: none; padding: 0;">
@@ -124,7 +119,6 @@
                                                 {% endfor %}
                                         </ul>
                                 </div>
-                        {% endif %}
 
                     <div class="album-covers">
                         <h3>Notable Albums</h3>
