@@ -1,10 +1,7 @@
-from flask import Flask, render_template, request, jsonify, render_template, redirect, url_for
+from flask import Flask, render_template, request
 import os
-import requests
-import base64
 from dotenv import load_dotenv
 from APIQueries import get_token, artist_search, get_top_tracks
-import os
 
 # Load environment variables
 load_dotenv()
@@ -15,6 +12,8 @@ app = Flask(__name__)
 # Fetch the Spotify token
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
+if not client_id or not client_secret:
+    raise ValueError("CLIENT_ID or CLIENT_SECRET is missing from .env!")
 SPOTIFY_TOKEN = get_token(client_id, client_secret)
 
 @app.route("/")
@@ -24,21 +23,30 @@ def index():
 
 @app.route("/query", methods=["POST"])
 def query():
-    """Handle the form submission and fetch artist top tracks."""
     artist_name = request.form.get("spotify_artist")
+    print(f"Received artist name: {artist_name}")  # Debugging log
+
     if not artist_name:
+        print("Artist name is missing.")  # Debugging log
         return render_template("index.html", error="Please enter an artist name!")
 
     try:
-        # Get artist ID
+        print("Fetching artist data...")  # Debugging log
+        # Get artist ID and display name
         artist_id, artist_display_name = artist_search(SPOTIFY_TOKEN, artist_name)
+        print(f"Artist ID: {artist_id}, Artist Name: {artist_display_name}")  # Debugging log
+
         if not artist_id:
+            print("Artist not found.")  # Debugging log
             return render_template("index.html", error="Artist not found. Please try again!")
 
+        print("Fetching top tracks...")  # Debugging log
         # Get top tracks
         top_tracks = get_top_tracks(SPOTIFY_TOKEN, artist_id)
+        print(f"Top Tracks: {top_tracks}")  # Debugging log
 
-        # Pass data to the HTML for rendering
+        print("Rendering return.html template...")  # Debugging log
+        # Render the return.html template with data
         return render_template(
             "return.html",
             artist_name=artist_display_name,
@@ -46,9 +54,11 @@ def query():
         )
 
     except Exception as e:
+        print(f"Error occurred: {e}")  # Log the error
         return render_template("index.html", error=f"An error occurred: {str(e)}")
 
 
+<<<<<<< HEAD
 # @app.route("/query", methods=["POST"])
 # def query():
 #     """Handle the form submission and fetch artist top tracks."""
@@ -120,3 +130,8 @@ if not SPOTIFY_TOKEN:
 #     return [track["name"] for track in data["tracks"]]
 
 
+=======
+if __name__ == "__main__":
+    app.debug = True
+    app.run(host="0.0.0.0", port=8000)
+>>>>>>> d993a0cfa3e7fbe40996a0af898891303dc58ab0
