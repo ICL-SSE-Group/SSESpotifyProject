@@ -1,8 +1,25 @@
 from flask import Flask, render_template, request, jsonify, render_template, redirect, url_for
 import os
-from APIQueries import artist_search, get_top_tracks
+import requests
+import base64
+from dotenv import load_dotenv
+from APIQueries import get_token, artist_search, get_top_tracks
+import os
 
+# Load environment variables
+load_dotenv()
+
+# Initialize Flask app
 app = Flask(__name__)
+
+# Fetch the Spotify token
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET")
+SPOTIFY_TOKEN = get_token(client_id, client_secret)
+
+
+
+token = get_token()
 
 @app.route("/")
 def index():
