@@ -1,7 +1,7 @@
 import requests
 
 def get_auth_header(token):
-    return = {
+    return {
         "Authorization": f"Bearer {token}"
     }
 
