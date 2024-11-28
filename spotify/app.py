@@ -72,9 +72,13 @@ def query():
 #         return render_template("index.html", error=f"An error occurred: {str(e)}")
 
 
+# if __name__ == "__main__":
+#     app.debug = True
+#     app.run()
+
 if __name__ == "__main__":
-    app.debug = True
-    app.run()
+    app.run(debug=True, port=5001)  # Use any available port, e.g., 5001
+
 
 
 # Spotify API token from environment
