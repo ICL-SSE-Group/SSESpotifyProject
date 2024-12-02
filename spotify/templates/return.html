@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,17 +14,25 @@
             margin: 0;
             padding: 0;
         }
+
         h1 {
             color: #1DB954; /* Spotify green */
             text-align: center;
             margin-top: 20px;
         }
+
+        h2 {
+            color: #FF4500; /* Bright orange for artist names */
+            margin-left: 20px;
+        }
+
         ul {
             list-style-type: none;
             padding: 0;
             margin: 20px auto;
             max-width: 600px;
         }
+
         li {
             background: #2A2A2A; /* Spotify grey */
             margin: 10px 0;
@@ -36,6 +45,7 @@
             font-size: 16px;
             transition: background 0.3s ease; /* Smooth background color transition */
         }
+
         .add-button {
             padding: 8px 15px;
             color: white;
@@ -45,16 +55,39 @@
             font-size: 14px;
             background: #1DB954; /* Spotify green */
         }
+
         .add-button:hover {
             transform: scale(1.05); /* Slight enlargement on hover */
         }
-        .added-1 { background: #FF4500; } /* Bright Orange */
-        .added-2 { background: #2FDA9C; } /* Spearmint */
-        .added-3 { background: #FF007F; } /* Fuchsia */
-        .added-4 { background: #6A0DAD; } /* Bright Purple */
-        .added-5 { background: #00CED1; } /* Soft Cyan */
-        .added-6 { background: #EE82EE; } /* Violet */
-        .added-7 { background: #FFB6C1; } /* Light Pink */
+
+        .added-1 {
+            background: #FF4500;
+        } /* Bright Orange */
+
+        .added-2 {
+            background: #2FDA9C;
+        } /* Spearmint */
+
+        .added-3 {
+            background: #FF007F;
+        } /* Fuchsia */
+
+        .added-4 {
+            background: #6A0DAD;
+        } /* Bright Purple */
+
+        .added-5 {
+            background: #00CED1;
+        } /* Soft Cyan */
+
+        .added-6 {
+            background: #EE82EE;
+        } /* Violet */
+
+        .added-7 {
+            background: #FFB6C1;
+        } /* Light Pink */
+
         .party-button {
             display: block;
             margin: 40px auto;
@@ -70,13 +103,21 @@
             cursor: pointer;
             animation: gradient-shift 3s infinite;
         }
+
         .party-button:hover {
             transform: scale(1.1); /* Slight enlargement on hover */
         }
+
         @keyframes gradient-shift {
-            0% { background-position: 0%; }
-            100% { background-position: 100%; }
+            0% {
+                background-position: 0%;
+            }
+
+            100% {
+                background-position: 100%;
+            }
         }
+
         .back-button {
             display: block;
             margin: 20px auto;
@@ -88,43 +129,56 @@
             text-decoration: none;
             width: 150px;
         }
-        .back-button:hover {
-            background: #14863e; /* Slightly darker green on hover */
-        }
-    </style>
-</head>
-<body>
-    <h1>Top Tracks for {{ artist_name }}</h1>
 
-    {% if top_tracks %}
-        <ul id="tracks-list">
-            {% for track in top_tracks %}
-                <li id="track-box-{{ loop.index }}">
-                    <span>{{ track }}</span>
-                    <button class="add-button" onclick="addTrack('{{ track }}', {{ loop.index }})">Add</button>
-                </li>
+        .back-button:hover {
+            background: #14863e;
+        } /* Slightly darker green */
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Top Tracks for Your Selected Artists</h1>
+
+    <div id="artists-container">
+        {% for artist, tracks in artists_top_tracks.items() %}
+        <h2>{{ artist }}</h2>
+        <ul>
+            {% for track_data in tracks %}
+            <!-- Use the unique ID passed from backend -->
+            <li id="track-box-{{ track_data.id }}">
+                <span>{{ track_data.track }}</span>
+                <button class="add-button" onclick="addTrack('{{ track_data.track | replace("'", "\\'") }}', '{{ artist | replace("'", "\\'") }}', '{{ track_data.id }}')">Add</button>
+            </li>
             {% endfor %}
         </ul>
-        <button class="party-button" onclick="submitTracks()">Let's Party!</button>
-    {% else %}
-        <p style="text-align: center;">No top tracks found for {{ artist_name }}.</p>
-    {% endif %}
+        {% endfor %}
+    </div>
 
-    <a href="/" class="back-button">Search Another Artist</a>
+    <button class="party-button" onclick="submitTracks()">Let's Party!</button>
+
+    <a href="/" class="back-button">Back to Search</a>
 
     <script>
         // Track selected songs
         const selectedTracks = [];
+
+        // Colors for added tracks
         const addedColors = ['added-1', 'added-2', 'added-3', 'added-4', 'added-5', 'added-6', 'added-7'];
 
         // Function to handle adding tracks
-        function addTrack(track, index) {
-            if (!selectedTracks.includes(track)) {
-                selectedTracks.push(track);
+        function addTrack(track, artist, id) {
+            const trackInfo = { track, artist };
+
+            // Ensure the same track from the same artist isn't added multiple times
+            if (!selectedTracks.some(t => t.track === track && t.artist === artist)) {
+
+                selectedTracks.push(trackInfo);
 
                 // Get the track box and change its background color
-                const trackBox = document.getElementById(`track-box-${index}`);
-                trackBox.classList.add(addedColors[(index - 1) % addedColors.length]);
+                const trackBox = document.getElementById(`track-box-${id}`);
+                trackBox.classList.add(addedColors[(selectedTracks.length - 1) % addedColors.length]);
 
                 // Change button text to "Added!" and disable it
                 const button = trackBox.querySelector('button');
@@ -140,26 +194,12 @@
                 return;
             }
 
-            // Send selected tracks to the server
-            fetch('/submit-tracks', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ tracks: selectedTracks }),
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert("Your tracks have been submitted! Time to party!");
-                } else {
-                    alert("Something went wrong. Please try again.");
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("An error occurred. Please try again.");
-            });
+            console.log("Selected Tracks:", selectedTracks);
+            alert("Your party playlist is ready! Time to party!");
         }
     </script>
+
 </body>
+
 </html>
+
