@@ -59,3 +59,12 @@ def get_top_tracks(token, artist_id):
     response.raise_for_status()
     data = response.json()
     return [track["name"] for track in data["tracks"]]
+
+def audio_features(token, track_id):
+    url = GET "https://api.spotify.com/v1/audio-features/{id}/danceability"
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()  # Raise an error for bad HTTP status
+    return response.json()
