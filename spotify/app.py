@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import os
 from dotenv import load_dotenv
-from APIQueries import get_token, artist_search, get_top_tracks
+from APIQueries import get_token, artist_search, get_top_tracks, audio_features
 
 # Load environment variables
 load_dotenv()
@@ -56,6 +56,20 @@ def query():
     except Exception as e:
         print(f"Error occurred: {e}")  # Log the error
         return render_template("index.html", error=f"An error occurred: {str(e)}")
+    
+@app.route("/track-features", methods=["POST"])
+def track_features():
+    track_id = request.form.get("track_id")
+
+    token = APIQueries.get_token(CLIENT_ID, CLIENT_SECRET)
+    
+    try:
+        features = APIQueries.get_audio_features(token, track_id)
+    except requests.exceptions.RequestException as e:
+        return f"Error fetching audio features: {e}", 500
+
+    return render_template("party-ometer.html", features=features)
+
 
 
 if __name__ == "__main__":
