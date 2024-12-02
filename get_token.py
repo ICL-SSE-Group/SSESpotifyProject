@@ -1,22 +1,17 @@
-import base64
-import requests
+def get_token(client_id, client_secret):
+    auth_string = f"{client_id}:{client_secret}"
+    auth_bytes = auth_string.encode()
+    auth_base64 = base64.b64encode(auth_bytes).decode('utf-8')
 
-def get_spotify_token(client_id, client_secret):
-    # Spotify's token endpoint
-    url = "https://accounts.spotify.com/api/token"
+    url = "https://accounts.spotify.com/api/token"  # Ensure this is defined
     headers = {
-        "Authorization": "Basic " + base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+        "Authorization": f"Basic {auth_base64}"
     }
     data = {
         "grant_type": "client_credentials"
     }
+
+    # Send POST request to Spotify API
     response = requests.post(url, headers=headers, data=data)
     response.raise_for_status()
     return response.json()["access_token"]
-
-# Replace these with your actual Client ID and Client Secret
-client_id = "9f309a6f71bd4c7fa18ddab47352e7ae"
-client_secret = "a0bb0b31dd6f4baab31779cde4601a00"
-
-token = get_spotify_token(client_id, client_secret)
-print("Spotify OAuth Token:", token)
