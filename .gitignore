@@ -1,6 +1,7 @@
 .DS_Store
 __pycache__
 **/.*.swp
-venv
 credentials.json
 **/.idea
+venv
+.env

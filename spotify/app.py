@@ -47,6 +47,9 @@ def query():
 
         print("Rendering return.html template...")  # Debugging log
         # Render the return.html template with data
+
+        Da
+
         return render_template(
             "return.html",
             artist_name=artist_display_name,
@@ -57,7 +60,7 @@ def query():
         print(f"Error occurred: {e}")  # Log the error
         return render_template("index.html", error=f"An error occurred: {str(e)}")
     
-@app.route("/track-features", methods=["POST"])
+@app.route("/track-features", methods=["GET"])
 def track_features():
     track_id = request.form.get("track_id")
 
