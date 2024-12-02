@@ -58,7 +58,8 @@
                 border: 1px solid #1DB954;
                 border-radius: 4px;
                 color: black;
-                width: 80%;
+                width: 60%;
+                margin-bottom: 10px;
         }
         input[type="submit"] {
                 background-color: #1DB954; /* Spotify green for button */
@@ -67,6 +68,7 @@
                 border-radius: 4px;
                 padding: 10px 20px;
                 cursor: pointer;
+                margin-top: 20px; /* Adds space above the button */
         }
         input[type="submit"]:hover {
                 background-color: #14863e; /* Slightly darker green on hover */
@@ -104,8 +106,10 @@
                         </div>
                 </nav>
                         <form action="{{url_for('query')}}"  method="post">
-                                <label for="spotify-artist">Enter the name of an artist in Spotify to see their recommended tracks:</label><br>
-                                <input type="text" id="spotify-artist" name="spotify_artist" required>
+                                <label for="spotify-artist">Enter the name of three artist in Spotify to see their top tracks:</label><br>
+                                <input type="text" id="spotify-artist" name="spotify_artist1" placeholder="Artist 1" required><br>
+                                <input type="text" id="spotify-artist2" name="spotify_artist2" placeholder="Artist 2"><br>
+                                <input type="text" id="spotify-artist3" name="spotify_artist3" placeholder="Artist 3"><br>
                                 <input type="submit" value="Submit">
                         </form>
 
