@@ -61,7 +61,7 @@ def get_top_tracks(token, artist_id):
     return [track["name"] for track in data["tracks"]]
 
 def audio_features(token, track_id):
-    url = GET "https://api.spotify.com/v1/audio-features/{id}/danceability"
+    url = "https://api.spotify.com/v1/audio-features/{id}/danceability"
     headers = {
         "Authorization": f"Bearer {token}"
     }
