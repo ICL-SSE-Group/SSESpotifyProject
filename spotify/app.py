@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import os
 from dotenv import load_dotenv
-from APIQueries import get_token, artist_search, get_top_tracks #, audio_features
+from APIQueries import get_token, artist_search, get_top_tracks  # , audio_features
 
 # Initialize Flask app - This should be the first line after imports
 app = Flask(__name__)  # Make sure this is defined before any routes!
@@ -16,10 +16,12 @@ if not client_id or not client_secret:
     raise ValueError("CLIENT_ID or CLIENT_SECRET is missing from .env!")
 SPOTIFY_TOKEN = get_token(client_id, client_secret)
 
+
 @app.route("/")
 def index():
     """Render the homepage."""
     return render_template("index.html")
+
 
 @app.route("/query", methods=["POST"])
 def query():
@@ -38,7 +40,9 @@ def query():
     artist_names = [name for name in artist_names if name]
     if not artist_names:
         print("No artist names provided!")  # Debugging
-        return render_template("index.html", error="Please enter at least one artist name!")
+        return render_template(
+            "index.html", error="Please enter at least one artist name!"
+        )
 
     artists_top_tracks = {}  # Dictionary to hold artist names and their top tracks
     track_id_counter = 0  # Initialize a counter for unique track IDs
@@ -51,15 +55,18 @@ def query():
 
             if not artist_id:
                 print(f"Artist not found: {artist_name}")  # Debugging
-                artists_top_tracks[artist_name] = [{"track": "Artist not found.", "id": track_id_counter}]
+                artists_top_tracks[artist_name] = [
+                    {"track": "Artist not found.", "id": track_id_counter}
+                ]
                 track_id_counter += 1
             else:
                 # Get top tracks for the artist
                 top_tracks = get_top_tracks(SPOTIFY_TOKEN, artist_id)
-                
+
                 # Create the list of top tracks with unique IDs for each track
                 artists_top_tracks[artist_display_name] = [
-                    {"track": track, "id": f"{artist_index}-{i}"} for i, track in enumerate(top_tracks)
+                    {"track": track, "id": f"{artist_index}-{i}"}
+                    for i, track in enumerate(top_tracks)
                 ]
                 track_id_counter += len(top_tracks)
 
@@ -71,29 +78,18 @@ def query():
         return render_template("index.html", error=f"An error occurred: {str(e)}")
 
 
+# @app.route("/track-features", methods=["GET"])
+# def track_features():
+# track_id = request.form.get("track_id")
 
+# token = APIQueries.get_token(CLIENT_ID, CLIENT_SECRET)
 
-#@app.route("/track-features", methods=["GET"])
-#def track_features():
-    #track_id = request.form.get("track_id")
+# try:
+# features = APIQueries.get_audio_features(token, track_id)
+# except requests.exceptions.RequestException as e:
+# return f"Error fetching audio features: {e}", 500
 
-    #token = APIQueries.get_token(CLIENT_ID, CLIENT_SECRET)
-    
-    #try:
-        #features = APIQueries.get_audio_features(token, track_id)
-    #except requests.exceptions.RequestException as e:
-        #return f"Error fetching audio features: {e}", 500
-
-    #return render_template("party-ometer.html", features=features)
-
-
-
-
-
-
-
-
-
+# return render_template("party-ometer.html", features=features)
 
 
 if __name__ == "__main__":

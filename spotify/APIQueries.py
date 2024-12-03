@@ -8,15 +8,11 @@ from dotenv import load_dotenv
 def get_token(client_id, client_secret):
     auth_string = f"{client_id}:{client_secret}"
     auth_bytes = auth_string.encode()
-    auth_base64 = base64.b64encode(auth_bytes).decode('utf-8')
+    auth_base64 = base64.b64encode(auth_bytes).decode("utf-8")
 
     url = "https://accounts.spotify.com/api/token"
-    headers = {
-        "Authorization": f"Basic {auth_base64}"
-    }
-    data = {
-        "grant_type": "client_credentials"
-    }
+    headers = {"Authorization": f"Basic {auth_base64}"}
+    data = {"grant_type": "client_credentials"}
 
     response = requests.post(url, headers=headers, data=data)
     if response.status_code != 200:
@@ -26,9 +22,7 @@ def get_token(client_id, client_secret):
 
 
 def get_auth_header(token):
-    return {
-        "Authorization": f"Bearer {token}"
-    }
+    return {"Authorization": f"Bearer {token}"}
 
 
 def artist_search(token, artist_name):
@@ -43,7 +37,7 @@ def artist_search(token, artist_name):
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     data = response.json()
-    if not data['artists']['items']:
+    if not data["artists"]["items"]:
         raise ValueError("Artist not found!")
 
     # Get artist ID and name
@@ -60,11 +54,10 @@ def get_top_tracks(token, artist_id):
     data = response.json()
     return [track["name"] for track in data["tracks"]]
 
+
 def audio_features(token, track_id):
     url = "https://api.spotify.com/v1/audio-features/{id}/danceability"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
+    headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(url, headers=headers)
     response.raise_for_status()  # Raise an error for bad HTTP status
     return response.json()
