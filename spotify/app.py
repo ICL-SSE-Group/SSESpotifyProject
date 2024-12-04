@@ -82,22 +82,27 @@ def query():
 def save_tracks():
     data = request.get_json()
     if not data or not data.get('selectedTracks'):
-        return jsonify({"error":"No tracks provided"}), 400
-    
-    for track in data['selectedTracks']:
-        song_id = track['track']
-        song_name = track['track']
-        artist_name = track['track']
-        danceability = 0.5 
+        return jsonify({"error": "No tracks provided"}), 400
 
-    insert_song(song_id, song_name, artist_name, danceability)
-    
-    return jsonify({"message":"Tracks saved successfully!"})
+    for track in data['selectedTracks']:
+        song_id = track['id']
+        song_name = track['name']
+        artist_name = track['artist']
+        danceability = get_danceability(SPOTIFY_TOKEN, song_id)  # Fetch from Spotify API
+
+        # Save to database
+        insert_song(song_id, song_name, artist_name, danceability)
+
+        return jsonify({"message": "Tracks saved successfully!"})
+
 
 @app.route("/ranking")
 def view_playlist():
     playlist = fetch_all_songs()
-    return render_template("ranking.html", playlist=playlist)
+    # Sort playlist by danceability
+    sorted_playlist = sorted(playlist, key=lambda song: song['danceability'], reverse=True)
+    return render_template("ranking.html", playlist=sorted_playlist)
+
 
 if __name__ == "__main__":
     init_db()
