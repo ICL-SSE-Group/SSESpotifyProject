@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import os
 from dotenv import load_dotenv
 from APIQueries import get_token, artist_search, get_top_tracks  # , audio_features
+from databases import init_db, insert_song, fetch_all_songs
 
 # Initialize Flask app - This should be the first line after imports
 app = Flask(__name__)  # Make sure this is defined before any routes!
@@ -77,21 +78,7 @@ def query():
         print(f"Error occurred: {e}")  # Debugging log
         return render_template("index.html", error=f"An error occurred: {str(e)}")
 
-
-# @app.route("/track-features", methods=["GET"])
-# def track_features():
-# track_id = request.form.get("track_id")
-
-# token = APIQueries.get_token(CLIENT_ID, CLIENT_SECRET)
-
-# try:
-# features = APIQueries.get_audio_features(token, track_id)
-# except requests.exceptions.RequestException as e:
-# return f"Error fetching audio features: {e}", 500
-
-# return render_template("party-ometer.html", features=features)
-
-
 if __name__ == "__main__":
+    init_db()
     app.debug = True
     app.run(host="0.0.0.0", port=8000)
