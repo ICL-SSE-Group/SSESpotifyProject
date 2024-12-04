@@ -34,12 +34,19 @@ def fetch_all_songs():
     """Fetch all songs from the 'songs' table."""
     with sqlite3.connect(DB_FILE) as connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT id, song_name, artist_name, danceability FROM songs")
-        rows = cursor.fetchall()
+        cursor.execute("""
+                       SELECT id, song_name, artist_name, danceability
+                       FROM songs
+                       """)
+        return cursor.fetchall()
         
-    # Convert rows (list of tuples) into a list of dictionaries for better readability
-    songs = [
-        {"id": row[0], "song_name": row[1], "artist_name": row[2], "danceability": row[3]}
-        for row in rows
-    ]
-    return songs
+
+def fetch_sorted_songs():
+    with sqlite3.connect(DB_FILE) as connection:
+        cursor = connection.cursor()
+        cursor.exectute("""
+            SELECT song_name, artist_name, danceability
+            FROM songs
+            ORDER BY danceability DESC
+        """)
+        return cursor.fetchall()
