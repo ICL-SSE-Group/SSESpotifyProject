@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import os
 from dotenv import load_dotenv
 from APIQueries import get_token, artist_search, get_top_tracks  # , audio_features
