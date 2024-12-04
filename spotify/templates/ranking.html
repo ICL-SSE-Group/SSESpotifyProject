@@ -7,11 +7,24 @@
 </head>
 <body>
     <h1>Your Party Playlist</h1>
-    <ul>
-        {% for track in playlist %}
-        <li>{{ track.artist }} - {{ track.track }}</li>
-        {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>Song Name</th>
+                <th>Artist Name</th>
+                <th>Danceability</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for song in playlist %}
+            <tr>
+                <td>{{ song[1] }}</td>
+                <td>{{ song[2] }}</td>
+                <td>{{ song[3] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     <a href="/" class="back-button">Back to Search</a>
 </body>
 </html>

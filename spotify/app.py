@@ -77,6 +77,27 @@ def query():
     except Exception as e:
         print(f"Error occurred: {e}")  # Debugging log
         return render_template("index.html", error=f"An error occurred: {str(e)}")
+    
+@app.route("/save_tracks", methods=["POST"])
+def save_tracks():
+    data = request.get_json()
+    if not data or not data.get('selectedTracks'):
+        return jsonify({"error":"No tracks provided"}), 400
+    
+    for track in data['selectedTracks']:
+        song_id = track['track']
+        song_name = track['track']
+        artist_name = track['track']
+        danceability = 0.5 
+
+    insert_song(song_id, song_name, artist_name, danceability)
+    
+    return jsonify({"message":"Tracks saved successfully!"})
+
+@app.route("/ranking")
+def view_playlist():
+    playlist = fetch_all_songs()
+    return render_template("ranking.html", playlist=playlist)
 
 if __name__ == "__main__":
     init_db()
