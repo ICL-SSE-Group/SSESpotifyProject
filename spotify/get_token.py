@@ -1,3 +1,7 @@
+import base64
+import requests
+
+
 def get_token(client_id, client_secret):
     auth_string = f"{client_id}:{client_secret}"
     auth_bytes = auth_string.encode()
