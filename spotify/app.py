@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 import os
 from dotenv import load_dotenv
-from APIQueries import get_token, artist_search, get_top_tracks  # , audio_features
-from databases import init_db, insert_song, fetch_all_songs
+from spotify.APIQueries import get_token, artist_search, get_top_tracks  # , audio_features
+from spotify.databases import init_db, insert_song, fetch_all_songs
 
 # Initialize Flask app - This should be the first line after imports
 app = Flask(__name__)  # Make sure this is defined before any routes!
