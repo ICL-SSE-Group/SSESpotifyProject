@@ -1,4 +1,3 @@
-import os
 import base64
 import requests
 
@@ -18,8 +17,9 @@ def get_token(client_id, client_secret):
     response = requests.post(url, headers=headers, data=data)
     if response.status_code != 200:
         print(f"Failed to fetch token: {response.status_code}, {response.text}")
-    response.raise_for_status()
+        response.raise_for_status()  # Ensure an exception is raised
     return response.json()["access_token"]
+
 
 
 def get_auth_header(token):
@@ -28,7 +28,7 @@ def get_auth_header(token):
 
 def artist_search(token, artist_name):
     url = "https://api.spotify.com/v1/search"  # Endpoint for search
-    headers = get_auth_header(token)  # Create authorization header with access token
+    headers = get_auth_header(token) 
 
     params = {
         "q": artist_name,
@@ -64,8 +64,3 @@ def audio_features(token, track_id):
     return response.json()
 
 
-def get_songs_sorted_by_danceability():
-    # Example database query using SQLAlchemy or any database library
-    from your_database_model import db, Song  # Replace with your database setup
-
-    return Song.query.order_by(Song.danceability.desc()).all()
