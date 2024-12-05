@@ -41,22 +41,30 @@ def artist_search(token, artist_name):
 def get_top_tracks(token, artist_id):
     url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks"
     headers = get_auth_header(token)
-    params = {"market": "US"}  # Required parameter for the API
+    params = {"market": "US"}  # Required for API
 
     response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()
-    data = response.json()
+    response.raise_for_status()  # Raise error if response is unsuccessful
 
-    # Log the raw response for debugging
-    print(f"Top tracks response: {data}")
+    api_response = response.json()  # Parse the JSON response
 
-    return [
-        {
-            "track": track["name"],
-            "album": track["album"]["name"],  # Get the album name from the API response
-        }
-        for track in data["tracks"]
-    ]
+    # Log the response for debugging (optional)
+    print(f"Top tracks response: {api_response}")
+
+    # Extract track information
+    tracks = []
+    for item in api_response['tracks']:
+        track_name = item['name']
+        album_name = item['album']['name']  # Retrieve album name
+        track_id = item['id']
+
+        tracks.append({
+            'track': track_name,
+            'album': album_name,
+            'id': track_id,
+        })
+
+    return tracks
 
 def get_track_details(token, track_id):
     """Fetch track details using Spotify API"""
