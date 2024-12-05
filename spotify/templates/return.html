@@ -143,7 +143,7 @@
 
         // Function to handle adding tracks
         function addTrack(track, artist, id) {
-            const trackInfo = { 
+            const trackInfo = {
                 id: id,            // Track ID (from Spotify)
                 track: track,      // Track name
                 artist: artist,    // Artist name
@@ -182,17 +182,14 @@
                 },
                 body: JSON.stringify({ selectedTracks: selectedTracks })  // Convert the selected tracks to JSON
             })
-            .then(response => {
-                if (response.ok) {
-                    // Redirect to the ranking page after successful submission
-                    window.location.href = "/ranking";
-                } else {
-                    response.json().then(data => {
-                        alert("Failed to save tracks: " + data.error);
-                    });
-                }
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Redirect to the ranking page after successful submission
+                window.location.href = "/ranking";
             })
             .catch(error => {
+                console.error('Error:', error);
                 alert("Error saving tracks: " + error);
             });
         }

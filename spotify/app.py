@@ -77,42 +77,27 @@ def query():
 
 @app.route('/save_tracks', methods=['POST'])
 def save_tracks():
-    # Assuming you're using an access token for authorization
-    spotify_token = 'your_spotify_access_token_here'
-    headers = {
-        'Authorization': f'Bearer {spotify_token}'
-    }
+    selected_tracks = request.form.get("selectedTracks")
     
-    # Fetch top tracks from Spotify
-    top_tracks_url = 'https://api.spotify.com/v1/me/top/tracks?limit=10'
-    response = requests.get(top_tracks_url, headers=headers)
-    
-    if response.status_code == 200:
-        top_tracks = response.json().get('items', [])
-        
-        # Process the top tracks to extract track details and IDs
-        track_data = []
-        for track in top_tracks:
-            track_id = track['id']  # This is the valid base62 track ID
-            track_name = track['name']
-            artist_name = track['artists'][0]['name']
-            album_name = track['album']['name']
-            
-            track_data.append({
-                'id': track_id,
-                'track': track_name,
-                'artist': artist_name,
-                'album': album_name
-            })
+    if not selected_tracks:
+        return jsonify({'message': 'No tracks selected!'}), 400
 
-        # Now save the track data (you can insert into your database or other logic here)
-        # For example, if saving to the database:
-        # for track in track_data:
-        #     save_track_to_database(track)
+    selected_tracks = json.loads(selected_tracks)  # Parse the JSON data
 
-        return jsonify({'message': 'Tracks saved successfully!', 'data': track_data}), 200
-    else:
-        return jsonify({'message': 'Failed to fetch top tracks', 'error': response.json()}), 400
+    # You can now process and save the selected tracks
+    track_data = []
+    for track in selected_tracks:
+        # Here you could save the tracks to the database or perform other logic
+        track_data.append({
+            'id': track['id'],
+            'track': track['track'],
+            'artist': track['artist'],
+            'album': track['album']
+        })
+
+    # Return the response with the saved tracks
+    return jsonify({'message': 'Tracks saved successfully!', 'data': track_data}), 200
+
 
 @app.route("/ranking")
 def view_playlist():
