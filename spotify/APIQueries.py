@@ -41,47 +41,20 @@ def artist_search(token, artist_name):
 def get_top_tracks(token, artist_id):
     url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks"
     headers = get_auth_header(token)
-    params = {"market": "US"}  # Required for API
+    params = {"market": "US"}  # Required parameter for the API
 
     response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()  # Raise error if response is unsuccessful
-
-    api_response = response.json()  # Parse the JSON response
-
-    # Log the response for debugging (optional)
-    print(f"Top tracks response: {api_response}")
-
-    # Extract track information
-    tracks = []
-    for item in api_response['tracks']:
-        track_name = item['name']
-        album_name = item['album']['name']  # Retrieve album name
-        track_id = item['id']
-
-        tracks.append({
-            'track': track_name,
-            'album': album_name,
-            'id': track_id,
-        })
-
-    return tracks
-
-def get_track_details(token, track_id):
-    """Fetch track details using Spotify API"""
-    url = f"https://api.spotify.com/v1/tracks/{track_id}"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    data = response.json()
 
     # Log the raw response for debugging
-    print(f"Track details response: {response.json()}")
+    print(f"Top tracks response: {data}")
 
-    # Check if the response is successful
-    if response.status_code == 200:
-        track_data = response.json()
-        popularity = track_data.get('popularity', 0)  # Default to 0 if popularity is missing
-        return popularity
-    else:
-        return None  # Return None if there is an error
-
+    return [
+        {
+            "track": track["name"],  # Get the track name from the API response
+            "album": track["album"]["name"],  # Get the album name from the API response
+            "popularity": track["popularity"],  # Access the popularity from the API response
+        }
+        for track in data["tracks"]
+    ]

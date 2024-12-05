@@ -1,11 +1,10 @@
-from flask import Flask, render_template, request, jsonify, redirect
+from flask import Flask, render_template, request, jsonify, redirect, session
 import os
 from dotenv import load_dotenv
 from spotify.APIQueries import (
     get_token,
     artist_search,
-    get_top_tracks,
-    get_track_details
+    get_top_tracks
 )
 from spotify.databases import init_db, insert_song, fetch_all_songs
 
@@ -17,6 +16,8 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
 
 load_dotenv()
+
+app.secret_key = os.urandom(24)
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
@@ -59,11 +60,14 @@ def query():
                     {
                         "track": track["track"],
                         "album": track["album"],
+                        "popularity": track["popularity"],
                         "id": f"{artist_index}-{i}",
                         "artist": artist_display_name,
                     }
                     for i, track in enumerate(top_tracks)
                 ]
+
+        session["artists_top_tracks"] = artists_top_tracks
 
         return render_template(
             "return.html", artists_top_tracks=artists_top_tracks
@@ -75,39 +79,30 @@ def query():
         )
 
 
-@app.route('/save_tracks', methods=['POST'])
+@app.route("/save_tracks", methods=["POST"])
 def save_tracks():
-    selected_tracks = request.form.get("selectedTracks")
-    
-    if not selected_tracks:
-        return jsonify({'message': 'No tracks selected!'}), 400
+    # Get the selected tracks from the request
+    selected_tracks = request.json.get("selectedTracks")
 
-    selected_tracks = json.loads(selected_tracks)  # Parse the JSON data
+    # Store the selected tracks in the session
+    session["selected_tracks"] = selected_tracks
 
-    # You can now process and save the selected tracks
-    track_data = []
-    for track in selected_tracks:
-        # Here you could save the tracks to the database or perform other logic
-        track_data.append({
-            'id': track['id'],
-            'track': track['track'],
-            'artist': track['artist'],
-            'album': track['album']
-        })
+    # Respond with a success message
+    return jsonify({"status": "success"})
 
-    # Return the response with the saved tracks
-    return jsonify({'message': 'Tracks saved successfully!', 'data': track_data}), 200
 
 
 @app.route("/ranking")
-def view_playlist():
-    """View the playlist ranked by popularity or other stats."""
-    playlist = fetch_all_songs()
+def ranking():
+    """Render ranking page with selected top tracks."""
+    # Retrieve the selected tracks and all artist's top tracks from the session
+    selected_tracks = session.get("selected_tracks", [])
+    artists_top_tracks = session.get("artists_top_tracks", {})
 
-    # Sort playlist by popularity (or use another stat like 'valence', 'tempo')
-    sorted_playlist = sorted(
-        playlist, key=lambda song: song["popularity"], reverse=True
-    )
+    # Check if there are no selected tracks
+    if not selected_tracks:
+        return redirect(url_for('index'))  # Redirect to the index page if no tracks were selected
 
-    # Render the sorted playlist in the ranking template
-    return render_template("ranking.html", playlist=sorted_playlist)
+    # Render the ranking page with the selected tracks and all artists' top tracks
+    return render_template("ranking.html", selected_tracks=selected_tracks, artists_top_tracks=artists_top_tracks)
+

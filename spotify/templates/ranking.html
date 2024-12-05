@@ -72,30 +72,45 @@
         }
     </style>
 </head>
+
 <body>
 
-<h1>Ranked Playlist</h1>
+    <h2>All Artist Top Tracks</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Track</th>
-            <th>Artist</th>
-            <th>Album</th>
-            <th>Popularity</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for song in playlist %}
-        <tr>
-            <td>{{ song.song_name }}</td>
-            <td>{{ song.artist_name }}</td>
-            <td>{{ song.album_name }}</td>
-            <td>{{ song.popularity }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <!-- Table to display tracks -->
+    <table>
+        <thead>
+            <tr>
+                <th>Artist</th>
+                <th>Track</th>
+                <th>Album</th>
+                <th>Popularity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if artists_top_tracks %}
+                {% for artist, tracks in artists_top_tracks.items() %}
+                    {% for track in tracks %}
+                        <tr>
+                            <td>{{ artist }}</td>
+                            <td>{{ track.track }}</td>
+                            <td>{{ track.album }}</td>
+                            <td>{{ track.popularity }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4">No tracks available.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <a href="/" class="back-button">Back to Search</a>
 
 </body>
+
 </html>
+
+

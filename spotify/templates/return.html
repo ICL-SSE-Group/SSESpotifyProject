@@ -140,60 +140,63 @@
 
     <script>
         // Track selected songs
-        const selectedTracks = [];
+// Track selected songs
+const selectedTracks = [];
 
-        // Function to handle adding tracks
-        function addTrack(track, artist, id) {
-            const trackInfo = {
-                id: id,            // Track ID (from Spotify)
-                track: track,      // Track name
-                artist: artist,    // Artist name
-                album: "Album Name" // Optional: You can extract album name from your data source
-            };
+// Function to handle adding tracks
+function addTrack(track, artist, id) {
+    const trackInfo = {
+        id: id,            // Track ID (from Spotify)
+        track: track,      // Track name
+        artist: artist,    // Artist name
+        album: "Album Name", // Optional: You can extract album name from your data source
+        popularity: "Unknown" // Set this to the correct popularity if needed
+    };
 
-            // Ensure the same track from the same artist isn't added multiple times
-            if (!selectedTracks.some(t => t.track === track && t.artist === artist)) {
-                selectedTracks.push(trackInfo);
+    // Ensure the same track from the same artist isn't added multiple times
+    if (!selectedTracks.some(t => t.track === track && t.artist === artist)) {
+        selectedTracks.push(trackInfo);
 
-                // Get the track box and change its background color
-                const trackBox = document.getElementById(`track-box-${id}`);
-                trackBox.style.backgroundColor = "#4CAF50"; // Change background color to indicate it's added
+        // Get the track box and change its background color
+        const trackBox = document.getElementById(`track-box-${id}`);
+        trackBox.style.backgroundColor = "#4CAF50"; // Change background color to indicate it's added
 
-                // Change button text to "Added!" and disable it
-                const button = trackBox.querySelector('button');
-                button.textContent = "Added!";
-                button.disabled = true; // Disable the button
-            }
-        }
+        // Change button text to "Added!" and disable it
+        const button = trackBox.querySelector('button');
+        button.textContent = "Added!";
+        button.disabled = true; // Disable the button
+    }
+}
 
-        // Function to handle submitting tracks via AJAX
-        function submitTracks() {
-            if (selectedTracks.length === 0) {
-                alert("Please add some tracks before partying!");
-                return;
-            }
+// Function to handle submitting tracks via AJAX
+function submitTracks() {
+    if (selectedTracks.length === 0) {
+        alert("Please add some tracks before partying!");
+        return;
+    }
 
-            console.log("Selected Tracks:", selectedTracks);
+    console.log("Selected Tracks:", selectedTracks);
 
-            // Send the selected tracks as JSON via AJAX
-            fetch("/save_tracks", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"  // Set content type to JSON
-                },
-                body: JSON.stringify({ selectedTracks: selectedTracks })  // Convert the selected tracks to JSON
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                // Redirect to the ranking page after successful submission
-                window.location.href = "/ranking";
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Error saving tracks: " + error);
-            });
-        }
+    // Send the selected tracks as JSON via AJAX
+    fetch("/save_tracks", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"  // Set content type to JSON
+        },
+        body: JSON.stringify({ selectedTracks: selectedTracks })  // Convert the selected tracks to JSON
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        // Redirect to the ranking page after successful submission
+        window.location.href = "/ranking";
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Error saving tracks: " + error);
+    });
+}
+
     </script>
 
 </body>
