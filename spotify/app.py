@@ -5,6 +5,7 @@ from spotify.APIQueries import (
     get_token,
     artist_search,
     get_top_tracks,
+    audio_features,  # Added for get_danceability
 )
 from spotify.databases import init_db, insert_song, fetch_all_songs
 
@@ -46,7 +47,8 @@ def query():
     artists_top_tracks = {}
     try:
         for artist_index, artist_name in enumerate(artist_names):
-            artist_id, artist_display_name = artist_search(SPOTIFY_TOKEN, artist_name)
+            artist_id, artist_display_name = artist_search(
+                SPOTIFY_TOKEN, artist_name)
             if not artist_id:
                 artists_top_tracks[artist_name] = [
                     {"track": "Artist not found.", "id": artist_index},
@@ -61,37 +63,48 @@ def query():
                     for i, track in enumerate(top_tracks)
                 ]
 
-        return render_template("return.html", artists_top_tracks=artists_top_tracks)
+        return render_template(
+            "return.html", artists_top_tracks=artists_top_tracks)
     except Exception as e:
         return render_template(
             "index.html",
             error=f"An error occurred: {str(e)}",
         )
 
-    
+
 @app.route("/save_tracks", methods=["POST"])
 def save_tracks():
+    """
+    Save selected tracks to the database.
+    """
     data = request.get_json()
-    if not data or not data.get('selectedTracks'):
+    if not data or not data.get("selectedTracks"):
         return jsonify({"error": "No tracks provided"}), 400
 
-    for track in data['selectedTracks']:
-        song_id = track['id']
-        song_name = track['name']
-        artist_name = track['artist']
-        danceability = get_danceability(SPOTIFY_TOKEN, song_id)  # Fetch from Spotify API
+    for track in data["selectedTracks"]:
+        song_id = track["id"]
+        song_name = track["name"]
+        artist_name = track["artist"]
+        # Fetch danceability from Spotify API
+        danceability = audio_features(
+            SPOTIFY_TOKEN, song_id).get("danceability")
 
         # Save to database
         insert_song(song_id, song_name, artist_name, danceability)
 
-        return jsonify({"message": "Tracks saved successfully!"})
+    return jsonify({"message": "Tracks saved successfully!"})
 
 
 @app.route("/ranking")
 def view_playlist():
+    """
+    View the playlist ranked by danceability.
+    """
     playlist = fetch_all_songs()
     # Sort playlist by danceability
-    sorted_playlist = sorted(playlist, key=lambda song: song['danceability'], reverse=True)
+    sorted_playlist = sorted(
+        playlist, key=lambda song: song["danceability"], reverse=True
+    )
     return render_template("ranking.html", playlist=sorted_playlist)
 
 
