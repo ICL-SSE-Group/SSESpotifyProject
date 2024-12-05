@@ -3,28 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saved Playlist</title>
+    <title>Ranking Playlist</title>
+    <style>
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #2A2A2A;
+            border-radius: 10px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+
+        th {
+            background-color: #1DB954;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #3A3A3A;
+        }
+
+        tr:hover {
+            background-color: #5A5A5A;
+        }
+    </style>
 </head>
 <body>
-    <h1>Your Party Playlist</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Song Name</th>
-                <th>Artist Name</th>
-                <th>Danceability</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for song in playlist %}
-            <tr>
-                <td>{{ song[1] }}</td>
-                <td>{{ song[2] }}</td>
-                <td>{{ song[3] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="/" class="back-button">Back to Search</a>
+
+<h1>Ranked Playlist</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Track</th>
+            <th>Artist</th>
+            <th>Album</th>
+            <th>Popularity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for song in playlist %}
+        <tr>
+            <td>{{ song.song_name }}</td>
+            <td>{{ song.artist_name }}</td>
+            <td>{{ song.album_name }}</td>
+            <td>{{ song.popularity }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 </body>
 </html>

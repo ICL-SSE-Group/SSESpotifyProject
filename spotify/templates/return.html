@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +8,7 @@
         /* Spotify-Inspired Theme */
         body {
             background-color: #121212; /* Spotify black */
-            color: white; /* White text for readability */
+            color: white;
             font-family: calibri, sans-serif;
             margin: 0;
             padding: 0;
@@ -60,34 +59,6 @@
             transform: scale(1.05); /* Slight enlargement on hover */
         }
 
-        .added-1 {
-            background: #FF4500;
-        } /* Bright Orange */
-
-        .added-2 {
-            background: #2FDA9C;
-        } /* Spearmint */
-
-        .added-3 {
-            background: #FF007F;
-        } /* Fuchsia */
-
-        .added-4 {
-            background: #6A0DAD;
-        } /* Bright Purple */
-
-        .added-5 {
-            background: #00CED1;
-        } /* Soft Cyan */
-
-        .added-6 {
-            background: #EE82EE;
-        } /* Violet */
-
-        .added-7 {
-            background: #FFB6C1;
-        } /* Light Pink */
-
         .party-button {
             display: block;
             margin: 40px auto;
@@ -134,7 +105,6 @@
             background: #14863e;
         } /* Slightly darker green */
     </style>
-
 </head>
 
 <body>
@@ -156,6 +126,13 @@
         {% endfor %}
     </div>
 
+    <!-- Hidden Form to Submit Selected Tracks -->
+    <form action="{{ url_for('save_tracks') }}" method="POST" id="party-form">
+        <!-- Tracks will be added dynamically -->
+        <input type="hidden" name="selectedTracks" id="selectedTracksInput">
+        <input type="submit" style="display:none">
+    </form>
+
     <button class="party-button" onclick="submitTracks()">Let's Party!</button>
 
     <a href="/" class="back-button">Back to Search</a>
@@ -164,21 +141,22 @@
         // Track selected songs
         const selectedTracks = [];
 
-        // Colors for added tracks
-        const addedColors = ['added-1', 'added-2', 'added-3', 'added-4', 'added-5', 'added-6', 'added-7'];
-
         // Function to handle adding tracks
         function addTrack(track, artist, id) {
-            const trackInfo = { track, artist };
+            const trackInfo = { 
+                id: id,            // Track ID (from Spotify)
+                track: track,      // Track name
+                artist: artist,    // Artist name
+                album: "Album Name" // Optional: You can extract album name from your data source
+            };
 
             // Ensure the same track from the same artist isn't added multiple times
             if (!selectedTracks.some(t => t.track === track && t.artist === artist)) {
-
                 selectedTracks.push(trackInfo);
 
                 // Get the track box and change its background color
                 const trackBox = document.getElementById(`track-box-${id}`);
-                trackBox.classList.add(addedColors[(selectedTracks.length - 1) % addedColors.length]);
+                trackBox.style.backgroundColor = "#4CAF50"; // Change background color to indicate it's added
 
                 // Change button text to "Added!" and disable it
                 const button = trackBox.querySelector('button');
@@ -187,7 +165,7 @@
             }
         }
 
-        // Function to handle submitting tracks
+        // Function to handle submitting tracks via AJAX
         function submitTracks() {
             if (selectedTracks.length === 0) {
                 alert("Please add some tracks before partying!");
@@ -195,11 +173,31 @@
             }
 
             console.log("Selected Tracks:", selectedTracks);
-            alert("Your party playlist is ready! Time to party!");
+
+            // Send the selected tracks as JSON via AJAX
+            fetch("/save_tracks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"  // Set content type to JSON
+                },
+                body: JSON.stringify({ selectedTracks: selectedTracks })  // Convert the selected tracks to JSON
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Redirect to the ranking page after successful submission
+                    window.location.href = "/ranking";
+                } else {
+                    response.json().then(data => {
+                        alert("Failed to save tracks: " + data.error);
+                    });
+                }
+            })
+            .catch(error => {
+                alert("Error saving tracks: " + error);
+            });
         }
     </script>
 
 </body>
 
 </html>
-
