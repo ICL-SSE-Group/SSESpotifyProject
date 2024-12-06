@@ -51,6 +51,13 @@
             transition: background 0.3s ease; /* Smooth transition effect */
         }
 
+        .no-tracks {
+            text-align: center;
+            margin: 50px auto;
+            font-size: 20px;
+            color: #B3B3B3; /* Light grey for no tracks message */
+        }
+
         /* Back Button */
         .back-button {
             display: block;
@@ -75,42 +82,37 @@
 
 <body>
 
-    <h2>All Artist Top Tracks</h2>
+    <h1>Ranking Playlist</h1>
 
-    <!-- Table to display tracks -->
+    {% if merged_songs %}
     <table>
         <thead>
             <tr>
+                <th>Track Name</th>
                 <th>Artist</th>
-                <th>Track</th>
                 <th>Album</th>
                 <th>Popularity</th>
             </tr>
         </thead>
         <tbody>
-            {% if artists_top_tracks %}
-                {% for artist, tracks in artists_top_tracks.items() %}
-                    {% for track in tracks %}
-                        <tr>
-                            <td>{{ artist }}</td>
-                            <td>{{ track.track }}</td>
-                            <td>{{ track.album }}</td>
-                            <td>{{ track.popularity }}</td>
-                        </tr>
-                    {% endfor %}
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="4">No tracks available.</td>
-                </tr>
-            {% endif %}
+            {% for song in merged_songs %}
+            <tr>
+                <td>{{ song[0] }}</td> <!-- Track Name -->
+                <td>{{ song[1] }}</td> <!-- Artist Name -->
+                <td>{{ song[2] }}</td> <!-- Album Name -->
+                <td>{{ song[3] }}</td> <!-- Popularity -->
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div class="no-tracks">
+        <p>No tracks selected or available. Please go back and search for artists to create your playlist!</p>
+    </div>
+    {% endif %}
 
     <a href="/" class="back-button">Back to Search</a>
 
 </body>
 
 </html>
-
-
