@@ -1,13 +1,27 @@
-from flask import Flask, render_template, request, jsonify, redirect, session, url_for
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    session,
+    url_for,
+)
 import os
 from dotenv import load_dotenv
 import sqlite3
 from spotify.APIQueries import (
     get_token,
     artist_search,
-    get_top_tracks
+    get_top_tracks,
 )
-from spotify.databases import init_db, insert_all_songs, insert_selected_songs, merge_tables, reset_tables
+from spotify.databases import (
+    init_db,
+    insert_all_songs,
+    insert_selected_songs,
+    merge_tables,
+    reset_tables,
+)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -41,8 +55,8 @@ def reset_on_first_request():
     if not first_request_handled:
         try:
             print("Resetting tables on first request...", flush=True)
-            reset_tables()  # Call your reset function to clear the database tables
-            session.clear()  # Clear the session
+            reset_tables()
+            session.clear()
             first_request_handled = True
             print("Tables and session reset successfully!", flush=True)
         except Exception as e:
@@ -74,23 +88,26 @@ def query():
 
     try:
         for artist_index, artist_name in enumerate(artist_names):
-            artist_id, artist_display_name = artist_search(SPOTIFY_TOKEN, artist_name)
+            artist_id, artist_display_name = artist_search(
+                SPOTIFY_TOKEN, artist_name)
             if not artist_id:
                 artists_top_tracks[artist_name] = [
                     {"track": "Artist not found.", "id": artist_index},
                 ]
             else:
                 top_tracks = get_top_tracks(SPOTIFY_TOKEN, artist_id)
-                insert_all_songs([
-                    {
-                        "id": f"{artist_index}-{i}",
-                        "track": track["track"],
-                        "artist": artist_display_name,
-                        "album": track["album"],
-                        "popularity": track["popularity"]
-                    }
-                    for i, track in enumerate(top_tracks)
-                ])
+                insert_all_songs(
+                    [
+                        {
+                            "id": f"{artist_index}-{i}",
+                            "track": track["track"],
+                            "artist": artist_display_name,
+                            "album": track["album"],
+                            "popularity": track["popularity"],
+                        }
+                        for i, track in enumerate(top_tracks)
+                    ]
+                )
                 artists_top_tracks[artist_display_name] = [
                     {
                         "track": track["track"],
@@ -102,7 +119,8 @@ def query():
                     for i, track in enumerate(top_tracks)
                 ]
         session["artists_top_tracks"] = artists_top_tracks
-        return render_template("return.html", artists_top_tracks=artists_top_tracks)
+        return render_template(
+            "return.html", artists_top_tracks=artists_top_tracks)
     except Exception as e:
         return render_template(
             "index.html",
@@ -118,12 +136,18 @@ def save_tracks():
         print("Session cleared.", flush=True)
         selected_tracks = request.json.get("selectedTracks")
         if not selected_tracks:
-            return jsonify({"status": "error", "message": "No tracks selected"}), 400
+            return jsonify({
+                "status": "error", "message": "No tracks selected"}), 400
 
         insert_selected_songs(selected_tracks)
         merge_tables()
 
-        return jsonify({"status": "success", "message": "Tracks saved and merged successfully!"})
+        response_data = {
+            "status": "success",
+            "message": "Tracks saved and merged successfully!",
+        }
+        return jsonify(response_data)
+
     except Exception as e:
         print(f"Error in save_tracks: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -133,19 +157,22 @@ def save_tracks():
 def ranking():
     """Render the ranking page with merged song data."""
     try:
-        conn = sqlite3.connect('spotify.db')
+        conn = sqlite3.connect("spotify.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT track_name, artist_name, album_name, popularity FROM merged_songs")
+        cursor.execute(
+            """SELECT track_name, artist_name, album_name,
+            popularity FROM merged_songs"""
+        )
         merged_songs = cursor.fetchall()
         conn.close()
 
         if not merged_songs:
-            return redirect(url_for('index'))
+            return redirect(url_for("index"))
 
         return render_template("ranking.html", merged_songs=merged_songs)
     except Exception as e:
         print(f"Error: {e}")
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
 
 
 @app.route("/reset", methods=["POST"])
@@ -155,7 +182,8 @@ def reset():
         reset_tables()
         session.clear()
         print("Session cleared.", flush=True)
-        return jsonify({"status": "success", "message": "All tables and sessions reset!"})
+        return jsonify({
+            "status": "success", "message": "All tables and sessions reset!"})
     except Exception as e:
         print(f"Reset failed: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -163,4 +191,3 @@ def reset():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
-

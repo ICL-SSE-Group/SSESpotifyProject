@@ -1,9 +1,10 @@
 import sqlite3
 
+
 def init_db():
     from sqlite3 import connect
 
-    conn = connect('spotify.db')
+    conn = connect("spotify.db")
     cursor = conn.cursor()
 
     # Create all_songs table
@@ -42,35 +43,52 @@ def init_db():
 
 
 def insert_all_songs(songs):
-    conn = sqlite3.connect('spotify.db')
+    conn = sqlite3.connect("spotify.db")
     cursor = conn.cursor()
     for song in songs:
-        cursor.execute("""
-        INSERT OR IGNORE INTO all_songs (id, track_name, artist_name, album_name, popularity)
-        VALUES (?, ?, ?, ?, ?)
-        """, (song['id'], song['track'], song['artist'], song['album'], song['popularity']))
+        cursor.execute(
+            """
+            INSERT OR IGNORE INTO all_songs (
+                id, track_name, artist_name, album_name, popularity
+            ) VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                song["id"],
+                song["track"],
+                song["artist"],
+                song["album"],
+                song["popularity"],
+            ),
+        )
     conn.commit()
     conn.close()
 
 
 def insert_selected_songs(selected_songs):
-    conn = sqlite3.connect('spotify.db')
+    conn = sqlite3.connect("spotify.db")
     cursor = conn.cursor()
 
     for song in selected_songs:
-        cursor.execute("""
-        INSERT OR REPLACE INTO selected_songs (id, track_name, artist_name)
-        VALUES (?, ?, ?)
-        """, (song['id'], song['track'], song['artist']))
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO selected_songs (
+                id, track_name, artist_name
+            ) VALUES (?, ?, ?)
+            """,
+            (song["id"], song["track"], song["artist"]),
+        )
 
     conn.commit()
-    print("After insertion, selected_songs:", cursor.execute("SELECT * FROM selected_songs").fetchall(), flush=True)
+    print(
+        "After insertion, selected_songs:",
+        cursor.execute("SELECT * FROM selected_songs").fetchall(),
+        flush=True,
+    )
     conn.close()
 
 
-
 def merge_tables():
-    conn = sqlite3.connect('spotify.db')
+    conn = sqlite3.connect("spotify.db")
     cursor = conn.cursor()
 
     # Clear merged_songs
@@ -78,33 +96,32 @@ def merge_tables():
     print("merged_songs table cleared.", flush=True)
 
     # Insert merged data
-    cursor.execute("""
-    INSERT INTO merged_songs (id, track_name, artist_name, album_name, popularity)
-    SELECT
-        s.id,
-        s.track_name,
-        s.artist_name,
-        a.album_name,
-        a.popularity
-    FROM
-        selected_songs s
-    JOIN
-        all_songs a
-    ON
-        s.id = a.id;
-    """)
+    cursor.execute(
+        """
+        INSERT INTO merged_songs (
+            id, track_name, artist_name, album_name, popularity
+        ) SELECT
+            s.id,
+            s.track_name,
+            s.artist_name,
+            a.album_name,
+            a.popularity
+        FROM
+            selected_songs s
+        JOIN
+            all_songs a
+        ON
+            s.id = a.id;
+        """
+    )
 
     conn.commit()
     conn.close()
     print("Merged songs table updated successfully.", flush=True)
 
 
-
-
-
-
 def reset_tables():
-    conn = sqlite3.connect('spotify.db')
+    conn = sqlite3.connect("spotify.db")
     cursor = conn.cursor()
 
     try:
