@@ -56,21 +56,28 @@ def insert_all_songs(songs):
 def insert_selected_songs(selected_songs):
     conn = sqlite3.connect('spotify.db')
     cursor = conn.cursor()
+
     for song in selected_songs:
         cursor.execute("""
         INSERT OR REPLACE INTO selected_songs (id, track_name, artist_name)
         VALUES (?, ?, ?)
         """, (song['id'], song['track'], song['artist']))
+
     conn.commit()
+    print("After insertion, selected_songs:", cursor.execute("SELECT * FROM selected_songs").fetchall(), flush=True)
     conn.close()
 
 
+
 def merge_tables():
-    """Merge selected_songs with all_songs into merged_songs."""
     conn = sqlite3.connect('spotify.db')
     cursor = conn.cursor()
 
-    # Insert merged data into merged_songs
+    # Clear merged_songs
+    cursor.execute("DELETE FROM merged_songs;")
+    print("merged_songs table cleared.", flush=True)
+
+    # Insert merged data
     cursor.execute("""
     INSERT INTO merged_songs (id, track_name, artist_name, album_name, popularity)
     SELECT
@@ -89,16 +96,28 @@ def merge_tables():
 
     conn.commit()
     conn.close()
+    print("Merged songs table updated successfully.", flush=True)
+
+
+
+
 
 
 def reset_tables():
     conn = sqlite3.connect('spotify.db')
     cursor = conn.cursor()
 
-    # Clear all data
-    cursor.execute("DELETE FROM merged_songs;")
-    cursor.execute("DELETE FROM selected_songs;")
-    cursor.execute("DELETE FROM all_songs;")
+    try:
+        cursor.execute("DELETE FROM merged_songs;")
+        print("merged_songs table cleared.", flush=True)
+        cursor.execute("DELETE FROM selected_songs;")
+        print("selected_songs table cleared.", flush=True)
+        cursor.execute("DELETE FROM all_songs;")
+        print("all_songs table cleared.", flush=True)
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+    except Exception as e:
+        print(f"Error in reset_tables: {e}", flush=True)
+    finally:
+        conn.close()
+        print("Database connection closed.", flush=True)
