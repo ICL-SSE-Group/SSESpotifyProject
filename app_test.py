@@ -65,16 +65,8 @@ def test_save_tracks(client):
     assert response.json["status"] == "success"
 
 
-#def test_query_invalid_artist(client):
-    # Test with an invalid artist
-    #invalid_artist_name = "ThisArtistDoesNotExist12345"
-
-    #response = client.post("/query", data={
-        #"spotify_artist1": invalid_artist_name,
-        #"spotify_artist2": "",
-        #"spotify_artist3": "",
-    #})
-
-    # Check the response
-    #assert response.status_code == 200
-    #assert b"Artist not found" in response.data  # Check if the error message appears
+# Test save_tracks with no selected tracks
+def test_save_tracks_no_tracks(client):
+    response = client.post("/save_tracks", json={"selectedTracks": []})
+    assert response.status_code == 400
+    assert response.json["status"] == "error"
