@@ -14,6 +14,7 @@ from spotify.APIQueries import (
     get_token,
     artist_search,
     get_top_tracks,
+    get_tracks_by_album
 )
 from spotify.databases import (
     init_db,

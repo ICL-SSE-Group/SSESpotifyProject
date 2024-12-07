@@ -14,7 +14,8 @@ def init_db():
         track_name TEXT NOT NULL,
         artist_name TEXT NOT NULL,
         album_name TEXT NOT NULL,
-        popularity INTEGER NOT NULL
+        popularity INTEGER NOT NULL,
+        album_id TEXT NOT NULL
     );
     """)
 
@@ -23,7 +24,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS selected_songs (
         id TEXT PRIMARY KEY,
         track_name TEXT NOT NULL,
-        artist_name TEXT NOT NULL
+        artist_name TEXT NOT NULL,
+        album_id TEXT NOT NULL
     );
     """)
 
@@ -49,8 +51,8 @@ def insert_all_songs(songs):
         cursor.execute(
             """
             INSERT OR IGNORE INTO all_songs (
-                id, track_name, artist_name, album_name, popularity
-            ) VALUES (?, ?, ?, ?, ?)
+                id, track_name, artist_name, album_name, popularity, album_id
+            ) VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
                 song["id"],
@@ -58,10 +60,12 @@ def insert_all_songs(songs):
                 song["artist"],
                 song["album"],
                 song["popularity"],
+                song["album_id"]  # Add album_id here
             ),
         )
     conn.commit()
     conn.close()
+
 
 
 def insert_selected_songs(selected_songs):
@@ -75,7 +79,7 @@ def insert_selected_songs(selected_songs):
                 id, track_name, artist_name
             ) VALUES (?, ?, ?)
             """,
-            (song["id"], song["track"], song["artist"]),
+            (song["id"], song["track"], song["artist"], song["album_id"]),
         )
 
     conn.commit()
