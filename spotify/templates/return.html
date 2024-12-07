@@ -120,7 +120,7 @@
             <!-- Use the unique ID passed from backend -->
             <li id="track-box-{{ track_data.id }}">
                 <span>{{ track_data.track }}</span>
-                <button class="add-button" onclick="addTrack('{{ track_data.track | replace("'", "\\'") }}', '{{ artist | replace("'", "\\'") }}', '{{ track_data.id }}')">Add</button>
+                <button class="add-button" onclick="addTrack('{{ track_data.track | replace("'", "\\'") }}', '{{ artist | replace("'", "\\'") }}', '{{ track_data.id }}', '{{ track_data.album_id }}', '{{ track_data.album | replace("'", "\\'") }}', '{{ track_data.popularity }}')">Add</button>
             </li>
             {% endfor %}
         </ul>
@@ -144,13 +144,14 @@
 const selectedTracks = [];
 
 // Function to handle adding tracks
-function addTrack(track, artist, id) {
+function addTrack(track, artist, id, album_id, album, popularity) {
     const trackInfo = {
         id: id,            // Track ID (from Spotify)
         track: track,      // Track name
         artist: artist,    // Artist name
-        album: "Album Name", // Optional: You can extract album name from your data source
-        popularity: "Unknown" // Set this to the correct popularity if needed
+        album_id: album_id, // Album ID (passed dynamically)
+        album: album,      // Album name (passed dynamically)
+        popularity: popularity // Popularity (passed dynamically)
     };
 
     // Ensure the same track from the same artist isn't added multiple times

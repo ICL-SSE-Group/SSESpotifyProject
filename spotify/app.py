@@ -112,6 +112,7 @@ def query():
                             "artist": artist_display_name,
                             "album": track["album"],
                             "popularity": track["popularity"],
+                            "album_id": track["album_id"]
                         }
                         for i, track in enumerate(top_tracks)
                     ]
@@ -123,6 +124,7 @@ def query():
                         "popularity": track["popularity"],
                         "id": f"{artist_index}-{i}",
                         "artist": artist_display_name,
+                        "album_id": track["album_id"]
                     }
                     for i, track in enumerate(top_tracks)
                 ]
@@ -142,17 +144,31 @@ def save_tracks():
     try:
         session.clear()
         print("Session cleared.", flush=True)
+
         selected_tracks = request.json.get("selectedTracks")
         if not selected_tracks:
             return jsonify({
                 "status": "error", "message": "No tracks selected"}), 400
 
+        # List to hold tracks fetched from albums
+        all_album_tracks = []
+
+        # Extract album IDs from selected tracks and get album tracks
+        for track in selected_tracks:
+            album_id = track.get("album_id")  # Extract album_id from each track
+            if album_id:
+                # Call the function to get tracks by album_id
+                album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
+                all_album_tracks.extend(album_tracks)
+
+        # Optionally: Insert the selected tracks and fetched album tracks into the database
         insert_selected_songs(selected_tracks)
         merge_tables()
 
         response_data = {
             "status": "success",
             "message": "Tracks saved and merged successfully!",
+            "album_tracks": all_album_tracks  # Return album tracks for debugging or use
         }
         return jsonify(response_data)
 
