@@ -65,8 +65,16 @@ def reset_on_first_request():
 
 @app.route("/")
 def index():
-    """Render the homepage."""
-    return render_template("index.html")
+    """Render the homepage and reset the database tables."""
+    try:
+        # Reset the database tables
+        reset_tables()
+        print("Database reset on returning to index.html.", flush=True)
+
+        return render_template("index.html")
+    except Exception as e:
+        print(f"Error resetting database: {e}", flush=True)
+        return render_template("index.html", error=f"Error: {e}")
 
 
 @app.route("/query", methods=["POST"])
