@@ -8,6 +8,7 @@ from flask import (
     url_for,
 )
 import os
+import random
 from dotenv import load_dotenv
 import sqlite3
 from spotify.APIQueries import (
@@ -139,6 +140,8 @@ def query():
         )
 
 
+import random
+
 @app.route("/save_tracks", methods=["POST"])
 def save_tracks():
     """Save selected tracks and merge them with all songs."""
@@ -150,38 +153,56 @@ def save_tracks():
             return jsonify({
                 "status": "error", "message": "No tracks selected"}), 400
 
-        print(selected_tracks)
-
         # List to hold tracks fetched from albums
-        all_album_tracks = []
+        recommendation_tracks = []
 
         # Extract album IDs from selected tracks and get album tracks
         for track in selected_tracks:
             album_id = track.get("album_id")
-            print(album_id)
+            print(f"Album ID: {album_id}")
             if album_id:
                 # Call the function to get tracks by album_id
                 album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
-                all_album_tracks.extend(album_tracks)
+
+                # Check if album_tracks is populated
+                if album_tracks:
+                    print(f"Album Tracks: {album_tracks}")
+
+                    # Randomly select 3 tracks from the album
+                    random_tracks = random.sample(album_tracks, 3) if len(album_tracks) >= 3 else album_tracks
+                    print(f"Random Tracks: {random_tracks}")
+
+                    recommendation_tracks.extend(random_tracks)
+                else:
+                    print(f"No tracks found for album ID: {album_id}")
+
+        if not recommendation_tracks:
+            return jsonify({
+                "status": "error", "message": "No album tracks available"}), 400
 
         # Optionally: Insert the selected tracks into the database
         insert_selected_songs(selected_tracks)
         merge_tables()
 
         # Store album_tracks in session for access later
-        session['all_album_tracks'] = all_album_tracks
+        session['recommendation_tracks'] = recommendation_tracks
 
         # Return success response
         response_data = {
             "status": "success",
             "message": "Tracks saved and merged successfully!",
-            "album_tracks": all_album_tracks  # Return album tracks for debugging or use
+            "recommendation_tracks": recommendation_tracks  # Return album tracks for debugging or use
         }
         return jsonify(response_data)
 
     except Exception as e:
         print(f"Error in save_tracks: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+
+
+
 
 
 
@@ -204,10 +225,10 @@ def ranking():
             return redirect(url_for("index"))
 
         # Get album tracks from session
-        all_album_tracks = session.get('all_album_tracks', [])
+        recommendation_tracks = session.get('recommendation_tracks', [])
 
         # Render ranking.html and pass album_tracks to it
-        return render_template("ranking.html", merged_songs=merged_songs, album_tracks=all_album_tracks)
+        return render_template("ranking.html", merged_songs=merged_songs, recommendation_tracks=recommendation_tracks)
     except Exception as e:
         print(f"Error: {e}")
         return redirect(url_for("index"))
