@@ -15,7 +15,8 @@ def init_db():
         artist_name TEXT NOT NULL,
         album_name TEXT NOT NULL,
         popularity INTEGER NOT NULL,
-        album_id TEXT NOT NULL
+        album_id TEXT NOT NULL,
+        release_date TEXT NOT NULL
     );
     """)
 
@@ -25,6 +26,7 @@ def init_db():
         id TEXT PRIMARY KEY,
         track_name TEXT NOT NULL,
         artist_name TEXT NOT NULL,
+        album_name TEXT NOT NULL,
         album_id TEXT NOT NULL
     );
     """)
@@ -36,6 +38,7 @@ def init_db():
         track_name TEXT NOT NULL,
         artist_name TEXT NOT NULL,
         album_name TEXT NOT NULL,
+        release_date TEXT NOT NULL,
         popularity INTEGER NOT NULL
     );
     """)
@@ -51,8 +54,8 @@ def insert_all_songs(songs):
         cursor.execute(
             """
             INSERT OR IGNORE INTO all_songs (
-                id, track_name, artist_name, album_name, popularity, album_id
-            ) VALUES (?, ?, ?, ?, ?, ?)
+                id, track_name, artist_name, album_name, popularity, album_id, release_date
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 song["id"],
@@ -60,7 +63,8 @@ def insert_all_songs(songs):
                 song["artist"],
                 song["album"],
                 song["popularity"],
-                song["album_id"]  # Add album_id here
+                song["album_id"],
+                song["release_date"]
             ),
         )
     conn.commit()
@@ -76,10 +80,10 @@ def insert_selected_songs(selected_songs):
         cursor.execute(
             """
             INSERT OR REPLACE INTO selected_songs (
-                id, track_name, artist_name, album_id
-            ) VALUES (?, ?, ?, ?)
+                id, track_name, artist_name, album_name, album_id
+            ) VALUES (?, ?, ?, ?, ?)
             """,
-            (song["id"], song["track"], song["artist"], song["album_id"]),
+            (song["id"], song["track"], song["artist"], song["album_name"], song["album_id"]),
         )
 
     conn.commit()
@@ -104,13 +108,14 @@ def merge_tables():
     cursor.execute(
         """
         INSERT INTO merged_songs (
-            id, track_name, artist_name, album_name, popularity
+            id, track_name, artist_name, album_name, release_date, popularity
         )
         SELECT
             s.id,
             s.track_name,
             s.artist_name,
-            a.album_name,
+            s.album_name,
+            a.release_date,
             a.popularity
         FROM
             selected_songs s

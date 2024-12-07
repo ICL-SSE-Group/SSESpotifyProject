@@ -114,7 +114,8 @@ def query():
                             "artist": artist_display_name,
                             "album": track["album"],
                             "popularity": track["popularity"],
-                            "album_id": track["album_id"]
+                            "album_id": track["album_id"],
+                            "release_date": track["release_date"]
                         }
                         for i, track in enumerate(top_tracks)
                     ]
@@ -126,7 +127,9 @@ def query():
                         "popularity": track["popularity"],
                         "id": f"{artist_index}-{i}",
                         "artist": artist_display_name,
-                        "album_id": track["album_id"]
+                        "album_id": track["album_id"],
+                        "release_date": track["release_date"]
+
                     }
                     for i, track in enumerate(top_tracks)
                 ]
@@ -153,13 +156,16 @@ def save_tracks():
             return jsonify({
                 "status": "error", "message": "No tracks selected"}), 400
 
+        insert_selected_songs(selected_tracks)
+        merge_tables()
+
         # List to hold tracks fetched from albums
         recommendation_tracks = []
 
         # Extract album IDs from selected tracks and get album tracks
         for track in selected_tracks:
             album_id = track.get("album_id")
-            album_name = track.get("album")
+            album_name = track.get("album_name")
             artist_name = track.get("artist")
             if album_id:
                 # Call the function to get tracks by album_id
@@ -185,9 +191,7 @@ def save_tracks():
             return jsonify({
                 "status": "error", "message": "No album tracks available"}), 400
 
-        # Optionally: Insert the selected tracks into the database
-        insert_selected_songs(selected_tracks)
-        merge_tables()
+
 
         # Store album_tracks in session for access later
         session['recommendation_tracks'] = recommendation_tracks
@@ -219,7 +223,7 @@ def ranking():
         conn = sqlite3.connect("spotify.db")
         cursor = conn.cursor()
         cursor.execute(
-            """SELECT track_name, artist_name, album_name,
+            """SELECT track_name, artist_name, album_name, release_date,
             popularity FROM merged_songs"""
         )
         merged_songs = cursor.fetchall()

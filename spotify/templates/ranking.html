@@ -116,6 +116,7 @@
                 <th>Track Name</th>
                 <th>Artist</th>
                 <th>Album</th>
+                <th>Release Date</th>
                 <th>Popularity</th>
             </tr>
         </thead>
@@ -125,7 +126,8 @@
                 <td>{{ song[0] }}</td> <!-- Track Name -->
                 <td>{{ song[1] }}</td> <!-- Artist Name -->
                 <td>{{ song[2] }}</td> <!-- Album Name -->
-                <td>{{ song[3] }}</td> <!-- Popularity -->
+                <td>{{ song[3] }}</td> <!-- Release Date -->
+                <td>{{ song[4] }}</td> <!-- Popularity -->
             </tr>
             {% endfor %}
         </tbody>

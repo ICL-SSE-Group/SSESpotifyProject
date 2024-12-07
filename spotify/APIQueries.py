@@ -61,7 +61,8 @@ def get_top_tracks(token, artist_id):
             "track": track["name"],
             "album": track["album"]["name"],
             "popularity": track["popularity"],
-            "album_id": track["album"]["id"]
+            "album_id": track["album"]["id"],
+            "release_date": track["album"]["release_date"]
         }
         for track in data["tracks"]
     ]
@@ -84,9 +85,6 @@ def get_tracks_by_album(token, album_id):
     return [
         {
             "track": track["name"],
-            #"album": track.get("album", {}).get("name", "Unknown Album"),  # Safely get album name, fallback to "Unknown Album"
-            #"popularity": track.get("popularity", "Unknown"),  # Handle missing popularity
-            #"album_id": album_id  # Pass album_id as it's known
         }
         for track in data.get("items", [])  # Safely access "items" in case it's missing
     ]
