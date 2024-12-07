@@ -1,8 +1,6 @@
 import pytest
-import sqlite3
-from flask import session
-from spotify.app import app, reset_tables, init_db
-from spotify.APIQueries import artist_search, get_top_tracks
+from spotify.app import app, init_db
+
 
 @pytest.fixture
 def client():
@@ -20,7 +18,8 @@ def client():
 def test_homepage(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Enter the name of three artist in Spotify to see their top tracks" in response.data
+    assert b"""Enter the name of three artist in
+     Spotify to see their top tracks""" in response.data
 
 
 def test_query_real_artist(client):
@@ -32,7 +31,8 @@ def test_query_real_artist(client):
     client_secret = os.getenv("CLIENT_SECRET")
 
     if not client_id or not client_secret:
-        pytest.skip("Spotify API credentials are not set. Skipping real API test.")
+        pytest.skip(
+            "Spotify API credentials are not set. Skipping real API test.")
 
     # Retrieve a Spotify token
     token = get_token(client_id, client_secret)
