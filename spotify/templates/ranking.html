@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking Playlist</title>
+    <title>Your Favorite Songs</title>
     <style>
         body {
             background-color: #121212;
@@ -18,6 +18,12 @@
             color: #1DB954;
             text-align: center;
             margin-top: 20px;
+        }
+
+        h2 {
+            color: #1DB954;
+            text-align: center;
+            margin-top: 40px;
         }
 
         table {
@@ -76,12 +82,31 @@
             transform: scale(1.05);
             transition: transform 0.3s ease;
         }
+
+        .return-button {
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            padding: 10px 15px;
+            background: #FF5733;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            width: 150px;
+            font-size: 16px;
+        }
+
+        .return-button:hover {
+            background: #D94A28;
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
     </style>
 </head>
 
 <body>
 
-    <h1>Ranking Playlist</h1>
+    <h1>Your Favorite Songs</h1>
 
     <!-- Display merged songs table -->
     {% if merged_songs %}
@@ -133,12 +158,11 @@
         </tbody>
     </table>
     {% else %}
-    <div class="no-tracks">
-        <p>No recommended tracks available.</p>
-    </div>
+    <p>No tracks available.</p>
     {% endif %}
 
-    <a href="{{ url_for('index') }}" class="back-button">Back</a>
+    <!-- Return to search button -->
+    <a href="{{ url_for('index') }}" class="return-button">Return to Search</a>
 
 </body>
 
