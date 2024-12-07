@@ -159,7 +159,8 @@ def save_tracks():
         # Extract album IDs from selected tracks and get album tracks
         for track in selected_tracks:
             album_id = track.get("album_id")
-            print(f"Album ID: {album_id}")
+            album_name = track.get("album")
+            artist_name = track.get("artist")
             if album_id:
                 # Call the function to get tracks by album_id
                 album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
@@ -172,7 +173,11 @@ def save_tracks():
                     random_tracks = random.sample(album_tracks, 3) if len(album_tracks) >= 3 else album_tracks
                     print(f"Random Tracks: {random_tracks}")
 
-                    recommendation_tracks.extend(random_tracks)
+                    # Add the corresponding artist and album to each track
+                    for track in random_tracks:
+                        track['artist'] = artist_name  # Adding artist to the track
+                        track['album'] = album_name    # Adding album name to the track
+                        recommendation_tracks.append(track)
                 else:
                     print(f"No tracks found for album ID: {album_id}")
 
@@ -198,7 +203,6 @@ def save_tracks():
     except Exception as e:
         print(f"Error in save_tracks: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
-
 
 
 
