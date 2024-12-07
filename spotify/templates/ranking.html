@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ranking Playlist</title>
     <style>
-        
         body {
             background-color: #121212;
             color: white;
@@ -30,7 +29,8 @@
             overflow: hidden;
         }
 
-        th, td {
+        th,
+        td {
             padding: 15px;
             text-align: center;
             border: 1px solid #444;
@@ -83,6 +83,7 @@
 
     <h1>Ranking Playlist</h1>
 
+    <!-- Display merged songs table -->
     {% if merged_songs %}
     <table>
         <thead>
@@ -107,6 +108,31 @@
     {% else %}
     <div class="no-tracks">
         <p>No tracks selected or available. Please go back and search for artists to create your playlist!</p>
+    </div>
+    {% endif %}
+
+    <!-- Display album tracks if available -->
+    {% if album_tracks %}
+    <h2>Album Tracks</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Track Name</th>
+                <th>Album</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for track in album_tracks %}
+            <tr>
+                <td>{{ track.track }}</td>
+                <td>{{ track.album }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="no-tracks">
+        <p>No album tracks available.</p>
     </div>
     {% endif %}
 

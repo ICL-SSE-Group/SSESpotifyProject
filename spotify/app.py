@@ -168,10 +168,14 @@ def save_tracks():
         insert_selected_songs(selected_tracks)
         merge_tables()
 
+        # Store album_tracks in session for access later
+        session['all_album_tracks'] = all_album_tracks
+
+        # Return success response
         response_data = {
             "status": "success",
             "message": "Tracks saved and merged successfully!",
-            "album_tracks": all_album_tracks,  # Return album tracks for debugging or use
+            "album_tracks": all_album_tracks  # Return album tracks for debugging or use
         }
         return jsonify(response_data)
 
@@ -181,10 +185,12 @@ def save_tracks():
 
 
 
+
 @app.route("/ranking")
 def ranking():
     """Render the ranking page with merged song data."""
     try:
+        # Get merged songs from the database
         conn = sqlite3.connect("spotify.db")
         cursor = conn.cursor()
         cursor.execute(
@@ -197,10 +203,17 @@ def ranking():
         if not merged_songs:
             return redirect(url_for("index"))
 
-        return render_template("ranking.html", merged_songs=merged_songs)
+        # Get album tracks from session
+        all_album_tracks = session.get('all_album_tracks', [])
+
+        # Render ranking.html and pass album_tracks to it
+        return render_template("ranking.html", merged_songs=merged_songs, album_tracks=all_album_tracks)
     except Exception as e:
         print(f"Error: {e}")
         return redirect(url_for("index"))
+
+
+
 
 
 @app.route("/reset", methods=["POST"])
