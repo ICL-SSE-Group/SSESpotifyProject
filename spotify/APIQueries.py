@@ -77,17 +77,15 @@ def get_tracks_by_album(token, album_id):
     response.raise_for_status()
     data = response.json()
 
-    # Log the raw response for debugging
+    # Debugging: Print the response
     print(f"Album tracks response: {data}")
 
-    # Process and return a list of tracks with track name, album name, popularity, and album_id
     return [
         {
             "track": track["name"],
             "album": track["album"]["name"],
             "popularity": track.get("popularity", "Unknown"),  # Popularity is not available for individual tracks
-            "album_id": album_id  # Passing the album_id as it's known
+            "album_id": album_id  # Pass album_id as it's known
         }
         for track in data["items"]
     ]
-

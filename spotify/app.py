@@ -157,27 +157,27 @@ def save_tracks():
 
         # Extract album IDs from selected tracks and get album tracks
         #for track in selected_tracks:
-            #print(album_id)
-            #album_id = track.get("album_id")  # Extract album_id from each track
+            #album_id = track.get("album_id")
             #if album_id:
                 # Call the function to get tracks by album_id
                 #album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
                 #all_album_tracks.extend(album_tracks)
 
-        # Optionally: Insert the selected tracks and fetched album tracks into the database
+        # Optionally: Insert the selected tracks into the database
         insert_selected_songs(selected_tracks)
         merge_tables()
 
         response_data = {
             "status": "success",
             "message": "Tracks saved and merged successfully!",
-            #"album_tracks": all_album_tracks  # Return album tracks for debugging or use
+            "album_tracks": all_album_tracks,  # Return album tracks for debugging or use
         }
         return jsonify(response_data)
 
     except Exception as e:
         print(f"Error in save_tracks: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
+
 
 
 @app.route("/ranking")
