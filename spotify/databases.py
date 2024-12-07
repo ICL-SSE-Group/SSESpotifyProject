@@ -95,12 +95,13 @@ def merge_tables():
     cursor.execute("DELETE FROM merged_songs;")
     print("merged_songs table cleared.", flush=True)
 
-    # Insert merged data
+    # Insert merged data, ordered by popularity (descending)
     cursor.execute(
         """
         INSERT INTO merged_songs (
             id, track_name, artist_name, album_name, popularity
-        ) SELECT
+        ) 
+        SELECT
             s.id,
             s.track_name,
             s.artist_name,
@@ -111,13 +112,16 @@ def merge_tables():
         JOIN
             all_songs a
         ON
-            s.id = a.id;
+            s.id = a.id
+        ORDER BY a.popularity DESC;
         """
     )
 
     conn.commit()
     conn.close()
-    print("Merged songs table updated successfully.", flush=True)
+    print("Merged songs table updated and sorted by popularity successfully.", flush=True)
+
+
 
 
 def reset_tables():
