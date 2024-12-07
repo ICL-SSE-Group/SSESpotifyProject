@@ -1,9 +1,9 @@
 <html>
     <head>
         <style type="text/css">
-        /* Spotify Theme Updates */
+        
         .navbar {
-                background: black; /* Spotify black */
+                background: black;
                 padding-right: 15px;
                 padding-left: 15px;
                 border-radius: 10px;
@@ -23,7 +23,7 @@
         .logo a {
                 font-size: 25px;
                 font-weight: 400;
-                color: #1DB954; /* Spotify green */
+                color: #1DB954;
                 text-decoration: none;
         }
         li {
@@ -31,26 +31,26 @@
                 display: inline-block;
         }
         li a {
-                color: white; /* White text for links */
+                color: white;
                 font-size: 18px;
                 font-weight: bold;
                 margin-right: 25px;
                 text-decoration: none;
         }
         li a:hover {
-                color: #1DB954; /* Spotify green on hover */
+                color: #1DB954;
         }
         p {
                 text-align: center;
-                color: white; /* White text for paragraphs */
+                color: white;
         }
         form {
                 text-align: center;
                 margin-top: 20px;
         }
         body {
-                background-color: black; /* Spotify black for body */
-                color: white; /* White text for overall readability */
+                background-color: black;
+                color: white;
                 font-family: calibri, sans-serif;
         }
         input[type="text"] {
@@ -62,38 +62,38 @@
                 margin-bottom: 10px;
         }
         input[type="submit"] {
-                background-color: #1DB954; /* Spotify green for button */
+                background-color: #1DB954;
                 color: white;
                 border: none;
                 border-radius: 4px;
                 padding: 10px 20px;
                 cursor: pointer;
-                margin-top: 20px; /* Adds space above the button */
+                margin-top: 20px;
         }
         input[type="submit"]:hover {
-                background-color: #14863e; /* Slightly darker green on hover */
+                background-color: #14863e;
         }
         .album-covers {
-            text-align: center; /* Center-align the header */
+            text-align: center;
             margin-top: 40px;
         }
         .album-covers img {
-            width: 150px; /* Fixed size for album covers */
+            width: 150px;
             height: 150px;
-            margin: 10px; /* Spacing between album covers */
-            border-radius: 10px; /* Rounded corners for album covers */
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Adds a slight shadow for better appearance */
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
         .album-covers h3 {
             font-size: 20px;
-            color: #1DB954; /* Spotify green */
+            color: #1DB954;
             margin-bottom: 20px;
         }
         .album-container {
             display: flex;
-            justify-content: center; /* Centers the album covers horizontally */
-            flex-wrap: wrap; /* Allows the covers to wrap onto new lines if needed */
-            gap: 20px; /* Adds spacing between items */
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
         </style>
 </head>
@@ -106,7 +106,7 @@
                         </div>
                 </nav>
                         <form action="{{url_for('query')}}"  method="post">
-                                <label for="spotify-artist">Enter the name of three artist in Spotify to see their top tracks:</label><br>
+                                <label for="spotify-artist">Enter the name of your favorite three artists in Spotify to see their top tracks:</label><br>
                                 <input type="text" id="spotify-artist" name="spotify_artist1" placeholder="Artist 1" required><br>
                                 <input type="text" id="spotify-artist2" name="spotify_artist2" placeholder="Artist 2"><br>
                                 <input type="text" id="spotify-artist3" name="spotify_artist3" placeholder="Artist 3"><br>
