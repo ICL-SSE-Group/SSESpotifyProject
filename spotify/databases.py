@@ -100,7 +100,7 @@ def merge_tables():
         """
         INSERT INTO merged_songs (
             id, track_name, artist_name, album_name, popularity
-        ) 
+        )
         SELECT
             s.id,
             s.track_name,
@@ -119,9 +119,9 @@ def merge_tables():
 
     conn.commit()
     conn.close()
-    print("Merged songs table updated and sorted by popularity successfully.", flush=True)
-
-
+    print(
+        "Merged songs table updated and sorted by popularity successfully.",
+        flush=True)
 
 
 def reset_tables():

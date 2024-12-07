@@ -70,12 +70,11 @@ def index():
         # Reset the database tables
         reset_tables()
         print("Database reset on returning to index.html.", flush=True)
-        
+
         return render_template("index.html")
     except Exception as e:
         print(f"Error resetting database: {e}", flush=True)
         return render_template("index.html", error=f"Error: {e}")
-
 
 
 @app.route("/query", methods=["POST"])
