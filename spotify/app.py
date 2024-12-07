@@ -153,15 +153,16 @@ def save_tracks():
         print(selected_tracks)
 
         # List to hold tracks fetched from albums
-        #all_album_tracks = []
+        all_album_tracks = []
 
         # Extract album IDs from selected tracks and get album tracks
-        #for track in selected_tracks:
-            #album_id = track.get("album_id")
-            #if album_id:
+        for track in selected_tracks:
+            album_id = track.get("album_id")
+            print(album_id)
+            if album_id:
                 # Call the function to get tracks by album_id
-                #album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
-                #all_album_tracks.extend(album_tracks)
+                album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
+                all_album_tracks.extend(album_tracks)
 
         # Optionally: Insert the selected tracks into the database
         insert_selected_songs(selected_tracks)

@@ -67,6 +67,7 @@ def get_top_tracks(token, artist_id):
     ]
 
 
+
 def get_tracks_by_album(token, album_id):
     url = f"https://api.spotify.com/v1/albums/{album_id}/tracks"
     headers = get_auth_header(token)
@@ -83,9 +84,11 @@ def get_tracks_by_album(token, album_id):
     return [
         {
             "track": track["name"],
-            "album": track["album"]["name"],
-            "popularity": track.get("popularity", "Unknown"),  # Popularity is not available for individual tracks
-            "album_id": album_id  # Pass album_id as it's known
+            #"album": track.get("album", {}).get("name", "Unknown Album"),  # Safely get album name, fallback to "Unknown Album"
+            #"popularity": track.get("popularity", "Unknown"),  # Handle missing popularity
+            #"album_id": album_id  # Pass album_id as it's known
         }
-        for track in data["items"]
+        for track in data.get("items", [])  # Safely access "items" in case it's missing
     ]
+
+
