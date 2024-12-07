@@ -56,11 +56,6 @@ def get_top_tracks(token, artist_id):
     response.raise_for_status()
     data = response.json()
 
-    # Log the raw response for debugging
-    print(
-        f"Top tracks response: {data}"
-    )
-
     return [
         {
             "track": track["name"],

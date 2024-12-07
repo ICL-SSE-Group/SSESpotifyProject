@@ -76,8 +76,8 @@ def insert_selected_songs(selected_songs):
         cursor.execute(
             """
             INSERT OR REPLACE INTO selected_songs (
-                id, track_name, artist_name
-            ) VALUES (?, ?, ?)
+                id, track_name, artist_name, album_id
+            ) VALUES (?, ?, ?, ?)
             """,
             (song["id"], song["track"], song["artist"], song["album_id"]),
         )
@@ -89,6 +89,7 @@ def insert_selected_songs(selected_songs):
         flush=True,
     )
     conn.close()
+
 
 
 def merge_tables():

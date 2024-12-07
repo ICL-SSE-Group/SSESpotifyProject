@@ -144,23 +144,25 @@ def save_tracks():
     """Save selected tracks and merge them with all songs."""
     try:
         session.clear()
-        print("Session cleared.", flush=True)
 
         selected_tracks = request.json.get("selectedTracks")
         if not selected_tracks:
             return jsonify({
                 "status": "error", "message": "No tracks selected"}), 400
 
+        print(selected_tracks)
+
         # List to hold tracks fetched from albums
-        all_album_tracks = []
+        #all_album_tracks = []
 
         # Extract album IDs from selected tracks and get album tracks
-        for track in selected_tracks:
-            album_id = track.get("album_id")  # Extract album_id from each track
-            if album_id:
+        #for track in selected_tracks:
+            #print(album_id)
+            #album_id = track.get("album_id")  # Extract album_id from each track
+            #if album_id:
                 # Call the function to get tracks by album_id
-                album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
-                all_album_tracks.extend(album_tracks)
+                #album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
+                #all_album_tracks.extend(album_tracks)
 
         # Optionally: Insert the selected tracks and fetched album tracks into the database
         insert_selected_songs(selected_tracks)
@@ -169,7 +171,7 @@ def save_tracks():
         response_data = {
             "status": "success",
             "message": "Tracks saved and merged successfully!",
-            "album_tracks": all_album_tracks  # Return album tracks for debugging or use
+            #"album_tracks": all_album_tracks  # Return album tracks for debugging or use
         }
         return jsonify(response_data)
 
