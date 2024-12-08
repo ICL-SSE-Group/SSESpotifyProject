@@ -8,7 +8,6 @@ from flask import (
 )
 import os
 import random
-from dotenv import load_dotenv
 import sqlite3
 from spotify.APIQueries import (
     get_token,
@@ -26,9 +25,6 @@ from spotify.databases import (
 
 # Initialize Flask app
 app = Flask(__name__)
-
-# Load environment variables
-load_dotenv()
 
 # Configure Flask secret key
 app.secret_key = os.urandom(24)
