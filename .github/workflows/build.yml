@@ -26,7 +26,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.12 
+          python-version: 3.12
 
       - name: Install dependencies
         run: |
@@ -34,6 +34,9 @@ jobs:
           pip install -r requirements.txt || true
 
       - name: Run tests
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         run: pytest app_test.py
 
 
