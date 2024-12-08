@@ -14,12 +14,11 @@ def client():
         yield client
 
 
-# Test the homepage route
 def test_homepage(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"""Enter the name of your favorite three artists
-    in Spotify to see their top tracks""" in response.data
+    assert b"Enter the name of your favorite three artists" in response.data
+    assert b"in Spotify to see their top tracks" in response.data
 
 
 def test_query_real_artist(client):
