@@ -43,7 +43,7 @@ jobs:
         run: pytest app_test.py
 
   deploy-to-impaas:
-    needs: build
+    needs: python-formatting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
