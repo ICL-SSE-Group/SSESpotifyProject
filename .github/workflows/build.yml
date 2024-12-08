@@ -15,38 +15,30 @@ jobs:
       - name: Run flake8
         run: flake8 .
 
-  build:
-    needs: python-formatting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.12
+build:
+  needs: python-formatting
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install python-dotenv  # Ensure python-dotenv is installed
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12 
 
-      # Set environment variables for CLIENT_ID and CLIENT_SECRET using GitHub Secrets
-      - name: Set environment variables from GitHub Secrets
-        run: |
-          echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> $GITHUB_ENV
-          echo "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> $GITHUB_ENV
+    - name: Install dependencies
+      run: |
+        pip install Flask pytest requests python-dotenv
+        pip install -r requirements.txt || true
 
-      - name: Install Flask
-        run: pip install Flask
+    - name: Run tests
+      env:
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      run: pytest app_test.py
 
-      - name: Install Pytest
-        run: pip install pytest
-
-      - name: Run tests
-        run: pytest app_test.py
 
   deploy-to-impaas:
     needs: python-formatting
@@ -59,5 +51,6 @@ jobs:
         uses: /impaas/impaas-deploy@v3
         with:
           app-name: spotifyapp
+          deployment-token: ${{ secrets.TEAM_TOKEN }}
           deployment-token: ${{ secrets.TEAM_TOKEN }}
           method: PLATFORM
