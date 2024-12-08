@@ -30,13 +30,3 @@ jobs:
 
   deploy-to-impaas:
     needs: python-formatting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: ImPaaS-Deploy
-        uses: /impaas/impaas-deploy@v3
-        with:
-          app-name: spotifyapp
-          deployment-token: ${{ secrets.TEAM_TOKEN }}
