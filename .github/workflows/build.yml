@@ -35,30 +35,30 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify Token Generation
+      - name: Run Tests
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: |
-          python -c "
-import os
-import base64
-import requests
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        run: pytest app_test.py
 
-client_id = os.getenv('CLIENT_ID')
-client_secret = os.getenv('CLIENT_SECRET')
+  deploy-to-impaas:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-if not client_id or not client_secret:
-    print('CLIENT_ID or CLIENT_SECRET is missing.')
-else:
-    auth_header = base64.b64encode(f'{client_id}:{client_secret}'.encode()).decode()
-    response = requests.post(
-        'https://accounts.spotify.com/api/token',
-        headers={'Authorization': f'Basic {auth_header}'},
-        data={'grant_type': 'client_credentials'},
-    )
-    if response.status_code == 200:
-        print(f'Token fetched successfully: {response.json().get("access_token")}')
-    else:
-        print(f'Failed to fetch token: {response.status_code}, {response.text}')
-          "
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: ImPaaS-Deploy
+        uses: /impaas/impaas-deploy@v3
+        with:
+          app-name: spotifyapp
+          deployment-token: ${{ secrets.TEAM_TOKEN }}
