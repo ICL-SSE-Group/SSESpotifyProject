@@ -1,4 +1,4 @@
-name: Build
+name: Build and Deploy
 
 on: [push]
 
@@ -6,7 +6,7 @@ jobs:
   python-formatting:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -24,7 +24,7 @@ jobs:
     needs: python-formatting
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -36,13 +36,16 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run Tests
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         run: pytest app_test.py
 
   deploy-to-impaas:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -53,7 +56,7 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: ImPaaS-Deploy
+      - name: Deploy to Impaas
         uses: /impaas/impaas-deploy@v3
         with:
           app-name: spotifyapp
