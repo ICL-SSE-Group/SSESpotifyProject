@@ -6,9 +6,9 @@ from flask import (
     redirect,
     url_for,
 )
+from dotenv import load_dotenv
 import os
 import random
-from dotenv import load_dotenv
 import sqlite3
 from spotify.APIQueries import (
     get_token,
