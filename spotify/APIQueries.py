@@ -68,11 +68,10 @@ def get_top_tracks(token, artist_id):
     ]
 
 
-
 def get_tracks_by_album(token, album_id):
     url = f"https://api.spotify.com/v1/albums/{album_id}/tracks"
     headers = get_auth_header(token)
-    params = {"market": "US"}  # Optional: You can specify a market to limit the results to a region
+    params = {"market": "US"}  # optional
 
     # Send the request to get album tracks
     response = requests.get(url, headers=headers, params=params)
@@ -85,8 +84,7 @@ def get_tracks_by_album(token, album_id):
     return [
         {
             "track": track["name"],
+
         }
-        for track in data.get("items", [])  # Safely access "items" in case it's missing
+        for track in data.get("items", [])
     ]
-
-

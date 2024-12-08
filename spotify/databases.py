@@ -54,7 +54,8 @@ def insert_all_songs(songs):
         cursor.execute(
             """
             INSERT OR IGNORE INTO all_songs (
-                id, track_name, artist_name, album_name, popularity, album_id, release_date
+                id, track_name, artist_name, album_name,
+                popularity, album_id, release_date
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (
@@ -71,7 +72,6 @@ def insert_all_songs(songs):
     conn.close()
 
 
-
 def insert_selected_songs(selected_songs):
     conn = sqlite3.connect("spotify.db")
     cursor = conn.cursor()
@@ -83,7 +83,8 @@ def insert_selected_songs(selected_songs):
                 id, track_name, artist_name, album_name, album_id
             ) VALUES (?, ?, ?, ?, ?)
             """,
-            (song["id"], song["track"], song["artist"], song["album_name"], song["album_id"]),
+            (song["id"], song["track"], song["artist"],
+             song["album_name"], song["album_id"])
         )
 
     conn.commit()
@@ -93,7 +94,6 @@ def insert_selected_songs(selected_songs):
         flush=True,
     )
     conn.close()
-
 
 
 def merge_tables():

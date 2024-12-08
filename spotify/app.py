@@ -15,7 +15,7 @@ from spotify.APIQueries import (
     get_token,
     artist_search,
     get_top_tracks,
-    get_tracks_by_album
+    get_tracks_by_album,
 )
 from spotify.databases import (
     init_db,
@@ -50,29 +50,12 @@ init_db()
 first_request_handled = False
 
 
-@app.before_request
-def reset_on_first_request():
-    """Reset tables and session data on the first request."""
-    global first_request_handled
-    if not first_request_handled:
-        try:
-            print("Resetting tables on first request...", flush=True)
-            reset_tables()
-            session.clear()
-            first_request_handled = True
-            print("Tables and session reset successfully!", flush=True)
-        except Exception as e:
-            print(f"Error during first request reset: {e}", flush=True)
-
-
 @app.route("/")
 def index():
     """Render the homepage and reset the database tables."""
     try:
-        # Reset the database tables
         reset_tables()
         print("Database reset on returning to index.html.", flush=True)
-
         return render_template("index.html")
     except Exception as e:
         print(f"Error resetting database: {e}", flush=True)
@@ -99,7 +82,8 @@ def query():
     try:
         for artist_index, artist_name in enumerate(artist_names):
             artist_id, artist_display_name = artist_search(
-                SPOTIFY_TOKEN, artist_name)
+                SPOTIFY_TOKEN, artist_name
+            )
             if not artist_id:
                 artists_top_tracks[artist_name] = [
                     {"track": "Artist not found.", "id": artist_index},
@@ -115,7 +99,7 @@ def query():
                             "album": track["album"],
                             "popularity": track["popularity"],
                             "album_id": track["album_id"],
-                            "release_date": track["release_date"]
+                            "release_date": track["release_date"],
                         }
                         for i, track in enumerate(top_tracks)
                     ]
@@ -128,22 +112,20 @@ def query():
                         "id": f"{artist_index}-{i}",
                         "artist": artist_display_name,
                         "album_id": track["album_id"],
-                        "release_date": track["release_date"]
-
+                        "release_date": track["release_date"],
                     }
                     for i, track in enumerate(top_tracks)
                 ]
         session["artists_top_tracks"] = artists_top_tracks
-        return render_template(
-            "return.html", artists_top_tracks=artists_top_tracks)
+        return render_template("return.html",
+                               artists_top_tracks=artists_top_tracks)
+
     except Exception as e:
         return render_template(
             "index.html",
             error=f"An error occurred: {str(e)}",
         )
 
-
-import random
 
 @app.route("/save_tracks", methods=["POST"])
 def save_tracks():
@@ -154,72 +136,54 @@ def save_tracks():
         selected_tracks = request.json.get("selectedTracks")
         if not selected_tracks:
             return jsonify({
-                "status": "error", "message": "No tracks selected"}), 400
+                "status": "error",
+                "message": "No tracks selected",
+            }), 400
 
         insert_selected_songs(selected_tracks)
         merge_tables()
 
-        # List to hold tracks fetched from albums
         recommendation_tracks = []
 
-        # Extract album IDs from selected tracks and get album tracks
         for track in selected_tracks:
             album_id = track.get("album_id")
             album_name = track.get("album_name")
             artist_name = track.get("artist")
             if album_id:
-                # Call the function to get tracks by album_id
                 album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
 
-                # Check if album_tracks is populated
                 if album_tracks:
-                    print(f"Album Tracks: {album_tracks}")
+                    random_tracks = random.sample(
+                        album_tracks, 3
+                    ) if len(album_tracks) >= 3 else album_tracks
 
-                    # Randomly select 3 tracks from the album
-                    random_tracks = random.sample(album_tracks, 3) if len(album_tracks) >= 3 else album_tracks
-                    print(f"Random Tracks: {random_tracks}")
-
-                    # Add the corresponding artist and album to each track
                     for track in random_tracks:
-                        track['artist'] = artist_name  # Adding artist to the track
-                        track['album'] = album_name    # Adding album name to the track
+                        track["artist"] = artist_name
+                        track["album"] = album_name
                         recommendation_tracks.append(track)
-                else:
-                    print(f"No tracks found for album ID: {album_id}")
 
         if not recommendation_tracks:
             return jsonify({
-                "status": "error", "message": "No album tracks available"}), 400
+                "status": "error",
+                "message": "No album tracks available",
+            }), 400
 
+        session["recommendation_tracks"] = recommendation_tracks
 
-
-        # Store album_tracks in session for access later
-        session['recommendation_tracks'] = recommendation_tracks
-
-        # Return success response
-        response_data = {
+        return jsonify({
             "status": "success",
             "message": "Tracks saved and merged successfully!",
-            "recommendation_tracks": recommendation_tracks  # Return album tracks for debugging or use
-        }
-        return jsonify(response_data)
-
+            "recommendation_tracks": recommendation_tracks,
+        })
     except Exception as e:
         print(f"Error in save_tracks: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
-
-
-
-
-
-
 
 
 @app.route("/ranking")
 def ranking():
     """Render the ranking page with merged song data."""
     try:
-        # Get merged songs from the database
         conn = sqlite3.connect("spotify.db")
         cursor = conn.cursor()
         cursor.execute(
@@ -232,17 +196,16 @@ def ranking():
         if not merged_songs:
             return redirect(url_for("index"))
 
-        # Get album tracks from session
-        recommendation_tracks = session.get('recommendation_tracks', [])
+        recommendation_tracks = session.get("recommendation_tracks", [])
 
-        # Render ranking.html and pass album_tracks to it
-        return render_template("ranking.html", merged_songs=merged_songs, recommendation_tracks=recommendation_tracks)
+        return render_template(
+            "ranking.html",
+            merged_songs=merged_songs,
+            recommendation_tracks=recommendation_tracks,
+        )
     except Exception as e:
         print(f"Error: {e}")
         return redirect(url_for("index"))
-
-
-
 
 
 @app.route("/reset", methods=["POST"])
@@ -253,10 +216,27 @@ def reset():
         session.clear()
         print("Session cleared.", flush=True)
         return jsonify({
-            "status": "success", "message": "All tables and sessions reset!"})
+            "status": "success",
+            "message": "All tables and sessions reset!",
+        })
     except Exception as e:
         print(f"Reset failed: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.before_request
+def reset_on_first_request():
+    """Reset tables and session data on the first request."""
+    global first_request_handled
+    if not first_request_handled:
+        try:
+            print("Resetting tables on first request...", flush=True)
+            reset_tables()
+            session.clear()
+            first_request_handled = True
+            print("Tables and session reset successfully!", flush=True)
+        except Exception as e:
+            print(f"Error during first request reset: {e}", flush=True)
 
 
 if __name__ == "__main__":
