@@ -52,5 +52,4 @@ jobs:
         with:
           app-name: spotifyapp
           deployment-token: ${{ secrets.TEAM_TOKEN }}
-          deployment-token: ${{ secrets.TEAM_TOKEN }}
           method: PLATFORM
