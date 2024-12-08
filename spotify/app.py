@@ -40,9 +40,6 @@ client_secret = os.getenv("CLIENT_SECRET")
 if not client_id or not client_secret:
     raise ValueError("CLIENT_ID or CLIENT_SECRET is missing from .env!")
 
-# Fetch Spotify token
-SPOTIFY_TOKEN = get_token(client_id, client_secret)
-
 # Initialize database
 init_db()
 
@@ -50,6 +47,10 @@ init_db()
 @app.route("/")
 def index():
     """Render the homepage and reset the database tables."""
+
+    global SPOTIFY_TOKEN
+    SPOTIFY_TOKEN = get_token(client_id, client_secret)
+
     try:
         reset_tables()
         return render_template("index.html")
