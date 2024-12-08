@@ -4,7 +4,6 @@ from flask import (
     request,
     jsonify,
     redirect,
-    session,
     url_for,
 )
 import os
@@ -49,7 +48,7 @@ init_db()
 
 @app.route("/")
 def index():
-    """Render the homepage and reset the database tables.""" 
+    """Render the homepage and reset the database tables."""
     try:
         reset_tables()
         return render_template("index.html")
@@ -149,8 +148,9 @@ def save_tracks():
                 "message": "No tracks selected",
             }), 400
 
-        # Insert selected tracks into the database and join with all songs database
+        # Insert selected tracks into the database
         insert_selected_songs(selected_tracks)
+        # SQL JOIN with all songs database
         merge_tables()
 
         # Connect to the database for inserting recommendations
@@ -175,7 +175,11 @@ def save_tracks():
                         # Insert the recommended track into the database
                         cursor.execute("""
                             INSERT OR IGNORE INTO recommended_songs (
-                                id, track_name, artist_name, album_name, album_id
+                                id,
+                                track_name,
+                                artist_name,
+                                album_name,
+                                album_id
                             ) VALUES (?, ?, ?, ?, ?)
                         """, (
                             random_track.get("id"),
@@ -208,7 +212,11 @@ def ranking():
 
         # Fetch merged songs for ranking
         cursor.execute("""
-            SELECT track_name, artist_name, album_name, release_date, popularity
+            SELECT track_name,
+            artist_name,
+            album_name,
+            release_date,
+            popularity
             FROM merged_songs
         """)
         merged_songs = cursor.fetchall()

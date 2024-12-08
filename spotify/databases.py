@@ -99,11 +99,6 @@ def insert_selected_songs(selected_songs):
         )
 
     conn.commit()
-    print(
-        "After insertion, selected_songs:",
-        cursor.execute("SELECT * FROM selected_songs").fetchall(),
-        flush=True,
-    )
     conn.close()
 
 
@@ -113,7 +108,6 @@ def merge_tables():
 
     # Clear merged_songs
     cursor.execute("DELETE FROM merged_songs;")
-    print("merged_songs table cleared.", flush=True)
 
     # Insert merged data, ordered by popularity (descending)
     cursor.execute(
@@ -140,31 +134,32 @@ def merge_tables():
 
     conn.commit()
     conn.close()
-    print(
-        "Merged songs table updated and sorted by popularity successfully.",
-        flush=True)
 
 
 def reset_tables():
-    """Clear all tables in the database and ensure proper closure of the connection."""
+    """Clear all tables and ensure proper closure of the connection."""
     try:
         conn = sqlite3.connect("spotify.db")
         cursor = conn.cursor()
 
         # List of tables to be cleared
-        tables = ["merged_songs", "selected_songs", "all_songs", "recommended_songs"]
+        tables = ["merged_songs",
+                  "selected_songs",
+                  "all_songs",
+                  "recommended_songs"]
 
         for table in tables:
             try:
                 cursor.execute(f"DELETE FROM {table};")
-                print(f"{table} table cleared.", flush=True)
             except sqlite3.OperationalError:
-                print(f"Table {table} does not exist or could not be cleared.", flush=True)
+                print(
+                    f"Table {table} does not exist or could not be cleared.",
+                    flush=True)
 
         conn.commit()
+
     except Exception as e:
         print(f"Error in reset_tables: {e}", flush=True)
     finally:
         if conn:
             conn.close()
-            print("Database connection closed.", flush=True)
