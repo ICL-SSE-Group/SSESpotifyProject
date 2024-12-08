@@ -1,22 +1,17 @@
-name: Build and Deploy
-
+name: Build
 on: [push]
-
 jobs:
   python-formatting:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
-
       - name: Install flake8
         run: pip install flake8
-
       - name: Run flake8
         run: flake8 .
 
@@ -26,21 +21,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.12
-
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run Tests
-        env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        run: pytest app_test.py
+      - name: Install Flask
+        run: pip install Flask
+      - name: Install Pytest
+        run: pip install pytest
+      - name: Runs tests
+              run: pytest app_test.py
 
   deploy-to-impaas:
     needs: python-formatting
@@ -48,14 +34,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.12
-
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
 
       - name: ImPaaS-Deploy
         uses: /impaas/impaas-deploy@v3
