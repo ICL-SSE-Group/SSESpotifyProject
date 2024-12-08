@@ -251,8 +251,6 @@ def reset():
     try:
         # Clear all database tables
         reset_tables()
-        # Clear all data stored in the Flask session
-        session.clear()
 
         return jsonify({
             "status": "success",
