@@ -38,11 +38,10 @@ app.secret_key = os.urandom(24)
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 if not client_id or not client_secret:
-    raise ValueError("CLIENT_ID or CLIENT_SECRET is missing from .env!")
+    print("CLIENT_ID or CLIENT_SECRET is missing from .env!", flush=True)
 
 # Initialize database
 init_db()
-
 
 @app.route("/")
 def index():
