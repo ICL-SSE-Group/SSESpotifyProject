@@ -28,6 +28,8 @@ jobs:
       - name: Runs tests
         run: pytest app_test.py
 
+  deploy-to-impaas:
+    needs: python-formatting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
