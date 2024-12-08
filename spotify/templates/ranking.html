@@ -138,7 +138,6 @@
     </div>
     {% endif %}
 
-    <!-- Display album tracks if available -->
     {% if recommendation_tracks %}
     <h2>Recommended Tracks</h2>
     <table>
@@ -152,16 +151,18 @@
         <tbody>
             {% for track in recommendation_tracks %}
             <tr>
-                <td>{{ track['track'] }}</td>
-                <td>{{ track['artist'] }}</td>
-                <td>{{ track['album'] }}</td>
+                <td>{{ track[0] }}</td> <!-- Track Name -->
+                <td>{{ track[1] }}</td> <!-- Artist Name -->
+                <td>{{ track[2] }}</td> <!-- Album Name -->
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% else %}
-    <p>No tracks available.</p>
+    <p>No recommended tracks available.</p>
     {% endif %}
+    
+
 
     <!-- Return to search button -->
     <a href="{{ url_for('index') }}" class="return-button">Return to Search</a>

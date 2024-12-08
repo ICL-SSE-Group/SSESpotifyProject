@@ -140,7 +140,6 @@ def query():
 def save_tracks():
     """Save selected tracks and merge them with all songs."""
     try:
-
         # Get the selected tracks from the request JSON payload
         selected_tracks = request.json.get("selectedTracks")
 
@@ -154,8 +153,9 @@ def save_tracks():
         insert_selected_songs(selected_tracks)
         merge_tables()
 
-        # Initialise empty list to store recommended tracks
-        recommendation_tracks = []
+        # Connect to the database for inserting recommendations
+        conn = sqlite3.connect("spotify.db")
+        cursor = conn.cursor()
 
         for track in selected_tracks:
             album_id = track.get("album_id")
@@ -171,25 +171,29 @@ def save_tracks():
                         album_tracks, 3
                     ) if len(album_tracks) >= 3 else album_tracks
 
-                    for track in random_tracks:
-                        track["artist"] = artist_name
-                        track["album"] = album_name
-                        recommendation_tracks.append(track)
+                    for random_track in random_tracks:
+                        # Insert the recommended track into the database
+                        cursor.execute("""
+                            INSERT OR IGNORE INTO recommended_songs (
+                                id, track_name, artist_name, album_name, album_id
+                            ) VALUES (?, ?, ?, ?, ?)
+                        """, (
+                            random_track.get("id"),
+                            random_track.get("track"),
+                            artist_name,
+                            album_name,
+                            album_id
+                        ))
 
-        if not recommendation_tracks:
-            return jsonify({
-                "status": "error",
-                "message": "No album tracks available",
-            }), 400
-
-        # Save the recommended tracks in the session for later use
-        session["recommendation_tracks"] = recommendation_tracks
+        # Commit and close the database connection
+        conn.commit()
+        conn.close()
 
         return jsonify({
             "status": "success",
-            "message": "Tracks saved and merged successfully!",
-            "recommendation_tracks": recommendation_tracks,
+            "message": "Tracks saved and merged successfully!"
         })
+
     except Exception as e:
         print(f"Error in save_tracks: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -197,29 +201,35 @@ def save_tracks():
 
 @app.route("/ranking")
 def ranking():
-    """Render the ranking page with merged song data."""
+    """Render the ranking page with merged song data and recommendations."""
     try:
         conn = sqlite3.connect("spotify.db")
         cursor = conn.cursor()
-        # SQL query to fetch track data from the merged_songs table
-        cursor.execute(
-            """SELECT track_name, artist_name, album_name, release_date,
-            popularity FROM merged_songs"""
-        )
+
+        # Fetch merged songs for ranking
+        cursor.execute("""
+            SELECT track_name, artist_name, album_name, release_date, popularity
+            FROM merged_songs
+        """)
         merged_songs = cursor.fetchall()
+
+        # Fetch recommended songs from the database
+        cursor.execute("""
+            SELECT track_name, artist_name, album_name
+            FROM recommended_songs
+        """)
+        recommended_songs = cursor.fetchall()
+
         conn.close()
 
         if not merged_songs:
             return redirect(url_for("index"))
 
-        # Retrieve recommendation tracks stored in the session (if any)
-        recommendation_tracks = session.get("recommendation_tracks", [])
-
-        # Render the ranking.html template with the merged songs and recommendations
+        # Render the ranking page with merged songs and recommendations
         return render_template(
             "ranking.html",
             merged_songs=merged_songs,
-            recommendation_tracks=recommendation_tracks,
+            recommendation_tracks=recommended_songs,
         )
 
     except Exception as e:

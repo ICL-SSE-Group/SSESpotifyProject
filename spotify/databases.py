@@ -43,6 +43,17 @@ def init_db():
     );
     """)
 
+    # Create recommended_songs table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS recommended_songs (
+        id TEXT PRIMARY KEY,
+        track_name TEXT NOT NULL,
+        artist_name TEXT NOT NULL,
+        album_name TEXT NOT NULL,
+        album_id TEXT NOT NULL
+    );
+    """)
+
     conn.commit()
     conn.close()
 
@@ -135,20 +146,25 @@ def merge_tables():
 
 
 def reset_tables():
-    conn = sqlite3.connect("spotify.db")
-    cursor = conn.cursor()
-
+    """Clear all tables in the database and ensure proper closure of the connection."""
     try:
-        cursor.execute("DELETE FROM merged_songs;")
-        print("merged_songs table cleared.", flush=True)
-        cursor.execute("DELETE FROM selected_songs;")
-        print("selected_songs table cleared.", flush=True)
-        cursor.execute("DELETE FROM all_songs;")
-        print("all_songs table cleared.", flush=True)
+        conn = sqlite3.connect("spotify.db")
+        cursor = conn.cursor()
+
+        # List of tables to be cleared
+        tables = ["merged_songs", "selected_songs", "all_songs", "recommended_songs"]
+
+        for table in tables:
+            try:
+                cursor.execute(f"DELETE FROM {table};")
+                print(f"{table} table cleared.", flush=True)
+            except sqlite3.OperationalError:
+                print(f"Table {table} does not exist or could not be cleared.", flush=True)
 
         conn.commit()
     except Exception as e:
         print(f"Error in reset_tables: {e}", flush=True)
     finally:
-        conn.close()
-        print("Database connection closed.", flush=True)
+        if conn:
+            conn.close()
+            print("Database connection closed.", flush=True)
