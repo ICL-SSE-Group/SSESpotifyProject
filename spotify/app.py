@@ -43,6 +43,7 @@ if not client_id or not client_secret:
 # Initialize database
 init_db()
 
+
 @app.route("/")
 def index():
     """Render the homepage and reset the database tables."""
