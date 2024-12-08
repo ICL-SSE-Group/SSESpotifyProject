@@ -6,7 +6,6 @@ from flask import (
     redirect,
     url_for,
 )
-from dotenv import load_dotenv
 import os
 import random
 import sqlite3
@@ -23,12 +22,14 @@ from spotify.databases import (
     merge_tables,
     reset_tables,
 )
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # Load environment variables from .env if it exists
+except ImportError:
+    print("python-dotenv is not installed. Skipping .env loading.")
 
 # Initialize Flask app
 app = Flask(__name__)
-
-# Load environment variables
-load_dotenv()
 
 # Configure Flask secret key
 app.secret_key = os.urandom(24)
@@ -150,46 +151,44 @@ def save_tracks():
 
         # Insert selected tracks into the database
         insert_selected_songs(selected_tracks)
-        # SQL JOIN with all songs database
-        merge_tables()
+        merge_tables()  # Merge selected songs with all songs
 
-        # Connect to the database for inserting recommendations
         conn = sqlite3.connect("spotify.db")
         cursor = conn.cursor()
 
         for track in selected_tracks:
             album_id = track.get("album_id")
-            album_name = track.get("album_name")
-            artist_name = track.get("artist")
+            album_name = track.get("album_name", "Unknown Album Name")
+            artist_name = track.get("artist", "Unknown Artist")
+
             if album_id:
                 # Fetch tracks from the album using its Spotify ID
                 album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
+                if not album_tracks:
+                    continue  # Skip if no tracks found
 
                 # Randomly select up to 3 tracks from the album
-                if album_tracks:
-                    random_tracks = random.sample(
-                        album_tracks, 3
-                    ) if len(album_tracks) >= 3 else album_tracks
+                random_tracks = random.sample(
+                    album_tracks, min(len(album_tracks), 3))
 
-                    for random_track in random_tracks:
-                        # Insert the recommended track into the database
-                        cursor.execute("""
-                            INSERT OR IGNORE INTO recommended_songs (
-                                id,
-                                track_name,
-                                artist_name,
-                                album_name,
-                                album_id
-                            ) VALUES (?, ?, ?, ?, ?)
-                        """, (
-                            random_track.get("id"),
-                            random_track.get("track"),
+                # Insert recommendations into the database
+                for random_track in random_tracks:
+                    cursor.execute("""
+                        INSERT OR IGNORE INTO recommended_songs (
+                            id,
+                            track_name,
                             artist_name,
                             album_name,
                             album_id
-                        ))
+                        ) VALUES (?, ?, ?, ?, ?)
+                    """, (
+                        random_track.get("id"),
+                        random_track.get("track"),
+                        artist_name,
+                        album_name,
+                        album_id
+                    ))
 
-        # Commit and close the database connection
         conn.commit()
         conn.close()
 

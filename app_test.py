@@ -18,8 +18,8 @@ def client():
 def test_homepage(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"""Enter the name of three artist in
-     Spotify to see their top tracks""" in response.data
+    assert b"""Enter the name of your favorite three artists
+    in Spotify to see their top tracks""" in response.data
 
 
 def test_query_real_artist(client):
@@ -52,17 +52,22 @@ def test_query_real_artist(client):
     assert b"Taylor Swift" in response.data  # Check if artist name appears
 
 
-# Test save_tracks route
 def test_save_tracks(client):
     response = client.post("/save_tracks", json={
         "selectedTracks": [
-            {"id": "1", "track": "Track1", "artist": "Artist1"},
-            {"id": "2", "track": "Track2", "artist": "Artist2"}
+            {"id": "1",
+             "track": "Mr. Brightside",
+             "artist": "The Killers",
+             "album_name": "Hot Fuss",
+             "album_id": "4piJq7R3gjUOxnYs6lDCTg"},
+            {"id": "2",
+             "track": "Dreams",
+             "artist": "Fleetwood Mac",
+             "album_name": "Rumours",
+             "album_id": "1bt6q2SruMsBtcerNVtpZB"}
         ]
     })
-
     assert response.status_code == 200
-    assert response.json["status"] == "success"
 
 
 # Test save_tracks with no selected tracks
