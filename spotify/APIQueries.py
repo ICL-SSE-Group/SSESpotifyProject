@@ -3,6 +3,8 @@ import requests
 
 
 def get_token(client_id, client_secret):
+    """Fetch an access token from Spotify's API using client credentials"""
+
     auth_string = f"{client_id}:{client_secret}"
     auth_bytes = auth_string.encode()
     auth_base64 = base64.b64encode(auth_bytes).decode("utf-8")
@@ -22,12 +24,15 @@ def get_token(client_id, client_secret):
 
 
 def get_auth_header(token):
+    """Generate an authorization header using the access token."""
     return {
         "Authorization": f"Bearer {token}",
     }
 
 
 def artist_search(token, artist_name):
+    """Search for an artist by name using Spotify's API."""
+
     url = "https://api.spotify.com/v1/search"
     headers = get_auth_header(token)
     params = {
@@ -48,6 +53,8 @@ def artist_search(token, artist_name):
 
 
 def get_top_tracks(token, artist_id):
+    """Fetch the top tracks of a given artist."""
+
     url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks"
     headers = get_auth_header(token)
     params = {"market": "US"}  # Required parameter for the API
@@ -69,6 +76,8 @@ def get_top_tracks(token, artist_id):
 
 
 def get_tracks_by_album(token, album_id):
+    """Fetch all tracks from a given album."""
+
     url = f"https://api.spotify.com/v1/albums/{album_id}/tracks"
     headers = get_auth_header(token)
     params = {"market": "US"}  # optional

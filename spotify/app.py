@@ -46,17 +46,14 @@ SPOTIFY_TOKEN = get_token(client_id, client_secret)
 # Initialize database
 init_db()
 
-# Flag to ensure reset happens only once
-first_request_handled = False
-
 
 @app.route("/")
 def index():
-    """Render the homepage and reset the database tables."""
+    """Render the homepage and reset the database tables.""" 
     try:
         reset_tables()
-        print("Database reset on returning to index.html.", flush=True)
         return render_template("index.html")
+
     except Exception as e:
         print(f"Error resetting database: {e}", flush=True)
         return render_template("index.html", error=f"Error: {e}")
@@ -65,31 +62,41 @@ def index():
 @app.route("/query", methods=["POST"])
 def query():
     """Handle artist queries and display their top tracks."""
+
+    # Extract artist names from form submission
     artist_names = [
         request.form.get("spotify_artist1"),
         request.form.get("spotify_artist2"),
         request.form.get("spotify_artist3"),
     ]
     artist_names = [name for name in artist_names if name]
+
     if not artist_names:
         return render_template(
             "index.html",
             error="Please enter at least one artist name!",
         )
 
+    # Dictionary to store top tracks for each artist
     artists_top_tracks = {}
 
     try:
+        # Search for each artist and get their Spotify ID and display name
         for artist_index, artist_name in enumerate(artist_names):
             artist_id, artist_display_name = artist_search(
                 SPOTIFY_TOKEN, artist_name
             )
+
             if not artist_id:
                 artists_top_tracks[artist_name] = [
                     {"track": "Artist not found.", "id": artist_index},
                 ]
+
+            # Fetch artist's top tracks using their Spotify ID
             else:
                 top_tracks = get_top_tracks(SPOTIFY_TOKEN, artist_id)
+
+                # Insert all top tracks into the database
                 insert_all_songs(
                     [
                         {
@@ -104,6 +111,7 @@ def query():
                         for i, track in enumerate(top_tracks)
                     ]
                 )
+                # Format and store the top tracks for rendering in the response
                 artists_top_tracks[artist_display_name] = [
                     {
                         "track": track["track"],
@@ -116,7 +124,8 @@ def query():
                     }
                     for i, track in enumerate(top_tracks)
                 ]
-        session["artists_top_tracks"] = artists_top_tracks
+
+        # Render the results page with the top tracks for each artist
         return render_template("return.html",
                                artists_top_tracks=artists_top_tracks)
 
@@ -131,18 +140,21 @@ def query():
 def save_tracks():
     """Save selected tracks and merge them with all songs."""
     try:
-        session.clear()
 
+        # Get the selected tracks from the request JSON payload
         selected_tracks = request.json.get("selectedTracks")
+
         if not selected_tracks:
             return jsonify({
                 "status": "error",
                 "message": "No tracks selected",
             }), 400
 
+        # Insert selected tracks into the database and join with all songs database
         insert_selected_songs(selected_tracks)
         merge_tables()
 
+        # Initialise empty list to store recommended tracks
         recommendation_tracks = []
 
         for track in selected_tracks:
@@ -150,8 +162,10 @@ def save_tracks():
             album_name = track.get("album_name")
             artist_name = track.get("artist")
             if album_id:
+                # Fetch tracks from the album using its Spotify ID
                 album_tracks = get_tracks_by_album(SPOTIFY_TOKEN, album_id)
 
+                # Randomly select up to 3 tracks from the album
                 if album_tracks:
                     random_tracks = random.sample(
                         album_tracks, 3
@@ -168,6 +182,7 @@ def save_tracks():
                 "message": "No album tracks available",
             }), 400
 
+        # Save the recommended tracks in the session for later use
         session["recommendation_tracks"] = recommendation_tracks
 
         return jsonify({
@@ -186,6 +201,7 @@ def ranking():
     try:
         conn = sqlite3.connect("spotify.db")
         cursor = conn.cursor()
+        # SQL query to fetch track data from the merged_songs table
         cursor.execute(
             """SELECT track_name, artist_name, album_name, release_date,
             popularity FROM merged_songs"""
@@ -196,13 +212,16 @@ def ranking():
         if not merged_songs:
             return redirect(url_for("index"))
 
+        # Retrieve recommendation tracks stored in the session (if any)
         recommendation_tracks = session.get("recommendation_tracks", [])
 
+        # Render the ranking.html template with the merged songs and recommendations
         return render_template(
             "ranking.html",
             merged_songs=merged_songs,
             recommendation_tracks=recommendation_tracks,
         )
+
     except Exception as e:
         print(f"Error: {e}")
         return redirect(url_for("index"))
@@ -212,31 +231,18 @@ def ranking():
 def reset():
     """Reset all tables and clear session data."""
     try:
+        # Clear all database tables
         reset_tables()
+        # Clear all data stored in the Flask session
         session.clear()
-        print("Session cleared.", flush=True)
+
         return jsonify({
             "status": "success",
             "message": "All tables and sessions reset!",
         })
+
     except Exception as e:
-        print(f"Reset failed: {e}", flush=True)
         return jsonify({"status": "error", "message": str(e)}), 500
-
-
-@app.before_request
-def reset_on_first_request():
-    """Reset tables and session data on the first request."""
-    global first_request_handled
-    if not first_request_handled:
-        try:
-            print("Resetting tables on first request...", flush=True)
-            reset_tables()
-            session.clear()
-            first_request_handled = True
-            print("Tables and session reset successfully!", flush=True)
-        except Exception as e:
-            print(f"Error during first request reset: {e}", flush=True)
 
 
 if __name__ == "__main__":
