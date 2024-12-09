@@ -17,15 +17,14 @@ def client():
 def test_homepage(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Enter the name of your favorite three artists" in response.data
-    assert b"in Spotify to see their top tracks" in response.data
+    assert b"Enter the name of up to three artists " in response.data
+    assert b"to see their top tracks:"
 
 
 def test_query_real_artist(client):
     import os
     from spotify.APIQueries import get_token
 
-    # Load Spotify API credentials
     client_id = os.getenv("CLIENT_ID")
     client_secret = os.getenv("CLIENT_SECRET")
 
@@ -33,11 +32,9 @@ def test_query_real_artist(client):
         pytest.skip(
             "Spotify API credentials are not set. Skipping real API test.")
 
-    # Retrieve a Spotify token
     token = get_token(client_id, client_secret)
     assert token is not None, "Failed to retrieve Spotify token."
 
-    # Test with a real artist
     artist_name = "Taylor Swift"
 
     response = client.post("/query", data={
@@ -46,9 +43,18 @@ def test_query_real_artist(client):
         "spotify_artist3": "",
     })
 
-    # Check the response
     assert response.status_code == 200
-    assert b"Taylor Swift" in response.data  # Check if artist name appears
+    assert b"Taylor Swift" in response.data
+
+
+def test_query_no_artist(client):
+    response = client.post("/query", data={
+        "spotify_artist1": "",
+        "spotify_artist2": "",
+        "spotify_artist3": "",
+    })
+    assert response.status_code == 200
+    assert b"Please enter at least one artist name!" in response.data
 
 
 def test_save_tracks(client):
@@ -69,8 +75,32 @@ def test_save_tracks(client):
     assert response.status_code == 200
 
 
-# Test save_tracks with no selected tracks
 def test_save_tracks_no_tracks(client):
     response = client.post("/save_tracks", json={"selectedTracks": []})
     assert response.status_code == 400
     assert response.json["status"] == "error"
+
+
+def test_save_tracks_duplicates(client):
+    response = client.post("/save_tracks", json={
+        "selectedTracks": [
+            {"id": "1",
+             "track": "Mr. Brightside",
+             "artist": "The Killers",
+             "album_name": "Hot Fuss",
+             "album_id": "4piJq7R3gjUOxnYs6lDCTg"},
+            {"id": "1",
+             "track": "Mr. Brightside",
+             "artist": "The Killers",
+             "album_name": "Hot Fuss",
+             "album_id": "4piJq7R3gjUOxnYs6lDCTg"}
+        ]
+    })
+    assert response.status_code == 200
+    assert response.json["status"] == "success"
+
+
+def test_ranking_no_tracks(client):
+    response = client.get("/ranking")
+    assert response.status_code == 302  # Redirects to homepage
+    assert response.location.endswith("/")  # Redirect URL

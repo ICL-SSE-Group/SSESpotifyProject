@@ -89,15 +89,21 @@
                         </div>
                 </nav>
                         <form action="{{url_for('query')}}"  method="post">
-                                <label for="spotify-artist">Enter the name of your favorite three artists in Spotify to see their top tracks:</label><br>
+                                <label for="spotify-artist">Enter the name of up to three artists to see their top tracks:</label><br>
                                 <input type="text" id="spotify-artist" name="spotify_artist1" placeholder="Artist 1" required><br>
                                 <input type="text" id="spotify-artist2" name="spotify_artist2" placeholder="Artist 2"><br>
                                 <input type="text" id="spotify-artist3" name="spotify_artist3" placeholder="Artist 3"><br>
                                 <input type="submit" value="Submit">
                         </form>
 
+                        {% if error %}
+                        <div style="color: red; text-align: center; margin-top: 10px;">
+                        {{ error }}
+                        </div>
+                        {% endif %}
+
                     <div class="album-covers">
-                        <h3>Favorite Albums by the Developers:</h3>
+                        <h3>Favourite Albums of the Developers:</h3>
                         <div class="album-container">
                             <a href = "https://open.spotify.com/album/4piJq7R3gjUOxnYs6lDCTg" target="_blank">
                                 <img src="{{ url_for('static', filename='images/The_Killers_Hot_Fuss.png') }}" alt="Hot Fuss by The Killers">
